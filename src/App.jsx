@@ -1,0 +1,35 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React from 'react';
+import Home from './Pages/Home';
+import About from './pages/About';
+import FindBlood from './pages/FindBlood';
+import DonateBlood from './pages/DonateBlood';
+import BloodBank from './pages/BloodBank';
+import Camp from './pages/Camp';
+import Navbar from './Component/Navbar/Navbar';
+import './App.css';
+import Login from './Pages/Login';
+import { BiLogIn } from 'react-icons/bi';
+
+function App() {
+  return (
+    <>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home/>} />
+          <Route path="/Home" element={<Home/>} />
+          <Route path="/About" element={<About/>} />
+          <Route path="/FBlood" element={<FindBlood/>} />
+          <Route path="/DBlood" element={<DonateBlood/>} />
+          <Route path="/BloodB" element={<BloodBank/>} />
+          <Route path="/Camp" element={<Camp/>} />
+          <Route path="/Login" element={<Login/>} />
+
+        </Routes>
+      </Router>
+    </>
+  );
+}
+
+export default App;
