@@ -1,10 +1,9 @@
-import React from 'react'
-import Navbar from '../Component/Navbar/Navbar'
 
+import React from "react";
 export default function Camp() {
   return (
     <div>
-      <h1>post here</h1>
+      <h1>camps</h1>
     </div>
-  )
+  );
 }

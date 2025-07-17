@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import BloodbankSignup from "../Component/Singup/BloodbankSignup";
 import Singup from "../Component/Singup/UserSingup";
 import Log from "../Component/Singup/log";
+import axios from 'axios';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(true);
