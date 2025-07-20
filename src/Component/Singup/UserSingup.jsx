@@ -130,6 +130,7 @@ export default function Signup({ gotoBloodBank, goto }) {
             </p>
           </form>
         </div>
+        
       </div>
     </div>
   );
