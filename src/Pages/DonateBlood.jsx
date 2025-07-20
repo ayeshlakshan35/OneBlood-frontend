@@ -30,7 +30,6 @@ const DonorEligibility = () => {
 
   return (
     <div className="">
-
       <section className="text-center mb-12 min-h-[400px] bg-red-600 py-12 rounded">
         <h1 className="text-4xl font-bold text-white mb-4">Become a Donor. Save Lives.</h1>
         <p className="text-white">Your one donation can save up to three lives.</p>
