@@ -13,7 +13,7 @@ export default function Navbar() {
 
 
   return (
-    <nav className="bg-red-100 shadow-md w-full sticky top-0 z-10 ">
+    <nav className="bg-white shadow-md w-full sticky top-0 z-10 ">
       <div className="flex flex-wrap items-center justify-between w-full px-4 py-3">
 
       {/* Clickable Logo */}

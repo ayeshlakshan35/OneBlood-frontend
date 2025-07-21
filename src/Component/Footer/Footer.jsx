@@ -5,7 +5,7 @@ const Footer = () => {
     <footer className="w-full bg-red-900 text-white">
       <div className="max-w-screen-xl mx-auto px-6 py-10 grid gap-8 sm:grid-cols-2 md:grid-cols-4 text-sm">
         
-        {/* OneBlood Info */}
+       
         <div>
           <h2 className="text-lg font-semibold mb-2">OneBlood</h2>
           <p className="text-gray-200">
@@ -13,7 +13,7 @@ const Footer = () => {
           </p>
         </div>
 
-        {/* Quick Links */}
+        
         <div>
           <h3 className="text-lg font-semibold mb-2">Quick Links</h3>
           <ul className="space-y-1 text-gray-200">
@@ -24,7 +24,7 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Support */}
+        
         <div>
           <h3 className="text-lg font-semibold mb-2">Support</h3>
           <ul className="space-y-1 text-gray-200">
@@ -35,7 +35,7 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Contact Info */}
+        
         <div>
           <h3 className="text-lg font-semibold mb-2">Contact Information</h3>
           <ul className="space-y-1 text-gray-200">

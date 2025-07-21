@@ -1,6 +1,7 @@
 import Navbar from '../Component/Navbar/Navbar';
 import React, { useState } from "react";
 import Footer from '../Component/Footer/Footer';
+import er from "../assets/er.png";
 
 const DonorEligibility = () => {
   const [formData, setFormData] = useState({
@@ -30,10 +31,18 @@ const DonorEligibility = () => {
 
   return (
     <div className="">
-      <section className="text-center mb-12 min-h-[400px] bg-red-600 py-12 rounded">
-        <h1 className="text-4xl font-bold text-white mb-4">Become a Donor. Save Lives.</h1>
-        <p className="text-white">Your one donation can save up to three lives.</p>
+      
+      <section className="relative text-center mb-12 min-h-[400px] bg-red-400 py-12 rounded overflow-hidden">
+        <div className="absolute inset-0 bg-cover bg-center opacity-30">
+        <img src={er} className='w-full'/>
+        </div>
+        <div className="absolute inset-0 bg-black opacity-40"></div>
+        <div className="relative z-10">
+            <h1 className="text-4xl font-bold text-white mb-4">Become a Donor. Save Lives.</h1>
+            <p className="text-white">Your one donation can save up to three lives.</p>
+        </div>
       </section>
+
       
 
        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-4xl mx-auto">
@@ -57,8 +66,25 @@ const DonorEligibility = () => {
         </div>
       </section>
 
+      <section className="bg-gray-50 p-6 max-w-4xl mx-auto rounded shadow">
+        <h2 className="text-xl font-semibold mb-3 text-center">Types of Donors</h2>
+        <div className="list-disc pl-5 text-gray-700">
+          <strong>Voluntary (Most Encouraged)</strong> 
+          <p>Safest and most encouraged form of donation. No payment involved.</p>
+          <strong>Replacement</strong> 
+          <p>Donation for family members or friends in need.</p>
+          <strong>Paid</strong> 
+          <p>Donation with monetary compensation.</p>
+          <strong>Directed</strong> 
+          <p>Donation for a specific patient’s medical need.</p>
+        </div>
+      </section>
+
+      <section className="p-6 max-w-4x5 max-h-6 mx-auto"></section>
+      
+
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow max-w-4xl mb-12 mx-auto">
-        <h2 className="text-xl font-semibold mb-4">Eligibility Form</h2>
+        <h2 className="text-xl font-semibold mb-4 text-center">Eligibility Form</h2>
 
         <label className="block mb-3">
           Select Blood Type
@@ -125,19 +151,10 @@ const DonorEligibility = () => {
         </button>
       </form>
 
-      <section className="bg-gray-50 p-6 max-w-4xl mx-auto rounded shadow">
-        <h2 className="text-xl font-semibold mb-3">Types of Donors</h2>
-        <ul className="list-disc pl-5 text-gray-700">
-          <li><strong>Voluntary (Most Encouraged):</strong> Safest and most encouraged form of donation. No payment involved.</li>
-          <li><strong>Replacement:</strong> Donation for family members or friends in need.</li>
-          <li><strong>Paid:</strong> Donation with monetary compensation.</li>
-          <li><strong>Directed:</strong> Donation for a specific patient’s medical need.</li>
-        </ul>
-      </section>
+      
 
-      <section className="p-6 max-w-4x5 max-h-6 mx-auto">
+      <section className="p-6 max-w-4x5 max-h-6 mx-auto"></section>
 
-      </section>
       <Footer/>
     </div>
   );
