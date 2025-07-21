@@ -6,12 +6,12 @@ export default function BloodbankSignup({ gotoBloodBank, goto }) {
   return (
     <div>
       <div className='space-x-3'>
-        {/* <span className='text-center text-gray-500 cursor-pointer' onClick={gotoBloodBank}>
+        <span className='text-center text-gray-500 cursor-pointer' onClick={gotoBloodBank}>
           User
         </span>
         <span className='text-2xl font-bold text-center space-x-10 cursor-pointer'>
           Blood bank
-        </span> */}
+        </span>
         <div>
           <form className='bg-gray-200 w-full max-w-md md:max-w-2xl px-6 sm:px-10 py-10 rounded-lg shadow-md space-y-4'>
             <h1 className='text-xl sm:text-2xl md:text-3xl font-bold text-center'>Sign up</h1>
