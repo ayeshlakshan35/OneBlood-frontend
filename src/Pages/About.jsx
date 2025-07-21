@@ -2,12 +2,21 @@ import React from 'react';
 import Navbar from '../Component/Navbar/Navbar';
 import Footer from '../Component/Footer/Footer';
 import about from "../assets/about.jpg";
+import ws from "../assets/ws.jpg";
+import { Link } from "react-router-dom";
+
+
+
+
 
 const AboutUs = () => {
   return (
+
     <div className="bg-white text-gray-800">
+
+     
       
-      <section className="relative text-center mb-12 min-h-[400px] bg-red-300 py-12 rounded overflow-hidden">
+      <section className="relative text-center mb-12 min-h-[400px] bg-red-400 py-12 rounded overflow-hidden">
        <div
         className="absolute inset-0 bg-cover bg-center opacity-30 z-0">
         <img src={about} className='w-full'/>
@@ -72,24 +81,29 @@ const AboutUs = () => {
 
 
       <section className="py-12 px-4 max-w-5xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-8">Meet Our Team</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          {[
-            ['DR', 'Dr. Sarah Rodriguez', 'Chief Medical Officer'],
-            ['MJ', 'Michael Johnson', 'Operations Director'],
-            ['LC', 'Lisa Chen', 'Technology Lead'],
-            ['DP', 'David Patel', 'Community Outreach'],
-          ].map(([initials, name, role], i) => (
-            <div key={i} className="flex flex-col items-center bg-gray-100 p-4 rounded-lg shadow-sm">
-              <div className="w-16 h-16 rounded-full bg-red-600 text-white flex items-center justify-center text-xl font-bold mb-2">{initials}</div>
-              <p className="font-semibold">{name}</p>
-              <p className="text-sm text-gray-600">{role}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <h2 className="text-3xl font-bold text-center mb-8">Meet Our Team</h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+    {[
+      ['https://www.shutterstock.com/image-photo/smiling-busy-professional-latin-business-600nw-2392837495.jpg', 'Dr. Sarah Rodriguez', 'Chief Medical Officer'],
+      ['https://media.istockphoto.com/id/1244524447/photo/successful-casual-business-woman-smiling.jpg?s=612x612&w=0&k=20&c=0kUhZlg5vTR-hDCOE5BlN-w2qFuQyEiaTIC8cz5i4qk=', 'Sanduni Pathirage', 'Operations Director'],
+      ['https://media.istockphoto.com/id/1399565382/photo/young-happy-mixed-race-businessman-standing-with-his-arms-crossed-working-alone-in-an-office.jpg?s=612x612&w=0&k=20&c=buXwOYjA_tjt2O3-kcSKqkTp2lxKWJJ_Ttx2PhYe3VM=', 'Lisa Chen', 'Technology Lead'],
+      ['https://img.freepik.com/premium-photo/photo-portrait-young-happy-business-woman-office-girl-secretary-with-smiling-face_763111-100050.jpg?w=360', 'David Patel', 'Community Outreach'],
+    ].map(([imageUrl, name, role], i) => (
+      <div key={i} className="flex flex-col items-center bg-gray-100 p-4 rounded-lg shadow-sm">
+        <img
+          src={imageUrl}
+          alt={name}
+          className="w-16 h-16 rounded-full object-cover mb-2"
+        />
+        <p className="font-semibold">{name}</p>
+        <p className="text-sm text-gray-600">{role}</p>
+      </div>
+    ))}
+  </div>
+</section>
 
-      {/* Impact Section */}
+
+      
       <section className="py-12 px-4 bg-gray-50">
         <h2 className="text-3xl font-bold text-center mb-8">Our Impact</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto text-center">
@@ -108,14 +122,38 @@ const AboutUs = () => {
       </section>
 
       
-      <section className="bg-red-500 max-w-5xl mx-auto text-white py-12 text-center px-4 rounded-lg shadow-md">
-        <h2 className="text-2xl md:text-3xl font-bold">Ready to Make a Difference?</h2>
-          <p className="mt-2">Join thousands of donors who are already saving lives. Your contribution can make a real difference in someone’s life today.</p>
-          <div className="mt-6 flex justify-center gap-4">
-            <button className="bg-white text-red-600 font-semibold py-2 px-4 rounded-md hover:bg-gray-100">Donate Blood</button>
-            <button className="bg-white text-red-600 font-semibold py-2 px-4 rounded-md hover:bg-gray-100">Find Blood</button>
-          </div>
-      </section>
+      <section
+  className="relative bg-red-500 max-w-5xl mx-auto text-white py-12 text-center px-4 rounded-lg shadow-md overflow-hidden"
+>
+  
+  <div
+    className="absolute inset-0 bg-cover bg-center opacity-50 z-0"
+    style={{ backgroundImage: "url('/child.png')" }}
+  ></div>
+
+ 
+  <div className="relative z-10">
+    <h2 className="text-2xl md:text-3xl font-bold">Ready to Make a Difference?</h2>
+    <p className="mt-2">
+      Join thousands of donors who are already saving lives. Your contribution can make a real difference in someone’s life today.
+    </p>
+        <div className="mt-6 flex justify-center gap-4">
+          <Link to="/DBlood">
+          <button className="bg-white text-red-600 font-semibold py-2 px-4 rounded-md hover:bg-gray-100">
+          Donate Blood
+          </button>
+          </Link>
+
+          <Link to="/FBlood">
+          <button className="bg-white text-red-600 font-semibold py-2 px-4 rounded-md hover:bg-gray-100">
+          Find Blood
+          </button>
+          </Link>
+        </div>
+
+  </div>
+</section>
+
 
       <section className="p-6 max-w-4x5 max-h-6 mx-auto"></section>
 
