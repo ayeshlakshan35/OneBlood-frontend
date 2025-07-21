@@ -55,7 +55,14 @@ export default function Signup({ gotoBloodBank, goto }) {
   return (
     <div>
       <div className='space-x-3'>
-        <br />
+        <span className='text-2xl font-bold text-center space-x-10 cursor-pointer'>
+          User
+        </span>
+        <span className='text-center text-gray-500 cursor-pointer' onClick={gotoBloodBank}>
+          Blood Bank
+        </span>
+
+      </div>
 
         <div>
           <form
@@ -132,6 +139,6 @@ export default function Signup({ gotoBloodBank, goto }) {
         </div>
         
       </div>
-    </div>
+   
   );
 }

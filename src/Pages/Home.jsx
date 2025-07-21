@@ -8,10 +8,8 @@ export default function Home() {
   return (
     <div>
         home
-        <Services />
+        <Services/>
         <Footer/>
-
-    
     </div>
   )
 }
