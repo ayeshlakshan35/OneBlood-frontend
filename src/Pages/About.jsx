@@ -60,6 +60,7 @@ const AboutUs = () => {
           Founded in 2010, OneBlood began as a small initiative by a group of medical professionals. We grew through partnerships with hospitals, local communities, and thousands of dedicated donors. Today, OneBlood is a trusted name, having helped over 100,000+ successful donations and saved countless lives.
         </p>
       </section>
+      <br/>
 
       
       <section className="py-12 px-4 bg-gray-50">
@@ -120,6 +121,7 @@ const AboutUs = () => {
           ))}
         </div>
       </section>
+      <br/>
 
       
       <section

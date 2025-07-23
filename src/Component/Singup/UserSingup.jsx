@@ -10,6 +10,7 @@ export default function Signup({ gotoBloodBank, goto }) {
     lastName: '',
     dob: '',
     phone: '',
+    nic: '',
     address: '',
     city: '',
     state: '',
@@ -18,6 +19,9 @@ export default function Signup({ gotoBloodBank, goto }) {
     password: '',
     confirmPassword: '',
   });
+
+
+
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -35,6 +39,25 @@ export default function Signup({ gotoBloodBank, goto }) {
       setError("Passwords do not match");
       return;
     }
+    
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.dob ||
+      !formData.phone ||
+      !formData.nic ||
+      !formData.address ||
+      !formData.city ||
+      !formData.state ||
+      !formData.postalCode ||
+      !formData.email ||
+      !formData.password
+    ) {
+      setError("Please fill all required fields.");
+      return;
+    }
+    
+   
 
     try {
       const res = await axios.post('http://localhost:5000/api/auth/register', formData, {
@@ -53,6 +76,7 @@ export default function Signup({ gotoBloodBank, goto }) {
   };
 
   return (
+
     <div>
       <div className='space-x-3'>
         <span className='text-2xl font-bold text-center space-x-10 cursor-pointer'>
@@ -63,7 +87,7 @@ export default function Signup({ gotoBloodBank, goto }) {
         </span>
 
       </div>
-
+        {/* form create */}
         <div>
           <form
             onSubmit={handleSubmit}
@@ -83,14 +107,18 @@ export default function Signup({ gotoBloodBank, goto }) {
             </div>
 
             <div className="flex flex-col md:flex-row gap-4">
-              <div className='w-full md:w-1/2'>
+              <div className='w-1/3'>
                 <label className='block mb-1 font-medium'>Date of Birth*</label>
                 <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="w-full p-2 border rounded" />
               </div>
-              <div className='w-full md:w-1/2'>
+              <div className='w-1/3'>
                 <label className='block mb-1 font-medium'>Phone Number*</label>
                 <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Enter phone number" className="w-full p-2 border rounded" />
               </div>
+              <div className='w-1/3'>
+                <label className='block mb-1 font-medium'>NIC Number*</label>
+                <input type="text" name="nic" value={formData.nic} onChange={handleChange} placeholder="Enter NIC number" className="w-full p-2 border rounded" />
+            </div>
             </div>
             <br />
 
@@ -126,6 +154,8 @@ export default function Signup({ gotoBloodBank, goto }) {
                 <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Confirm password" className="w-full p-2 border rounded" />
               </div>
             </div>
+
+            
 
             {/* Display error and success messages */}
             {error && <p className="text-red-600 text-center">{error}</p>}

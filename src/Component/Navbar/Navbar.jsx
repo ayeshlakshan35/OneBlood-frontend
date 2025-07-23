@@ -44,9 +44,9 @@ export default function Navbar() {
                 <NavLink to="/DBlood" className="px-4 py-2 hover:bg-red-100" onClick={() => setIsBloodDropdownOpen(false)}>
                   Donate Blood
                 </NavLink>
-                {/* <NavLink to="/BloodB" className="px-4 py-2 hover:bg-red-100" onClick={() => setIsBloodDropdownOpen(false)}>
+                <NavLink to="/BloodB" className="px-4 py-2 hover:bg-red-100" onClick={() => setIsBloodDropdownOpen(false)}>
                   Blood Bank
-                </NavLink> */}
+                </NavLink>
               </div>
             )}
           </div>
@@ -94,13 +94,13 @@ export default function Navbar() {
           Find Blood
         </NavLink><br/>
 
-         {/* <NavLink
+         <NavLink
           to="/DBlood"
           onClick={() => setIsOpen(false)}
           className={({ isActive }) => isActive ? "text-red-800 font-bold uppercase" : "font-semibold text-stone-800 hover:underline uppercase"}
         >
           Donate Blood
-        </NavLink><br/> */}
+        </NavLink><br/>
 
          <NavLink
           to="/BloodB"

@@ -7,7 +7,7 @@ axios.defaults.withCredentials = true; // Enable credentials for all requests
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import React from "react";
 import Home from "./Pages/Home";
-import About from "./pages/About";
+import About from "./Pages/About";
 import FindBlood from "./Pages/FindBlood";
 import DonateBlood from "./Pages/DonateBlood";
 import BloodBank from "./Pages/BloodBank";
@@ -16,6 +16,7 @@ import Navbar from "./Component/Navbar/Navbar";
 import "./App.css";
 import Login from "./Pages/Login";
 import { BiLogIn } from "react-icons/bi";
+
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path="/Camp" element={<Camp />} />
           <Route path="/Login" element={<Login />} />
         </Routes>
+    
       </Router>
     </>
   );
