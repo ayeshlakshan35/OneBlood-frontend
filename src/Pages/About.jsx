@@ -14,7 +14,7 @@ const AboutUs = () => {
 
     <div className="bg-white text-gray-800">
 
-     
+      <Navbar />  
       
       <section className="relative text-center mb-12 min-h-[400px] bg-red-400 py-12 rounded overflow-hidden">
        <div
@@ -28,11 +28,7 @@ const AboutUs = () => {
     <p className="mt-4 max-w-xl mx-auto text-lg">
       Connecting donors with those in need. Building a healthier community through safe and efficient blood donation services since 2010.
     </p>
-    <div className="mt-8 flex flex-wrap justify-center gap-8 text-xl font-semibold">
-      <div>50,000+ Lives Saved</div>
-      <div>25,000+ Active Donors</div>
-      <div>150+ Partner Hospitals</div>
-    </div>
+    
   </div>
 </section>
 
@@ -105,22 +101,7 @@ const AboutUs = () => {
 
 
       
-      <section className="py-12 px-4 bg-gray-50">
-        <h2 className="text-3xl font-bold text-center mb-8">Our Impact</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto text-center">
-          {[
-            ['50,000+', 'Lives Saved'],
-            ['25,000+', 'Active Donors'],
-            ['150+', 'Partner Hospitals'],
-            ['500+', 'Blood Camps'],
-          ].map(([stat, label], i) => (
-            <div key={i} className="bg-white p-6 shadow-md rounded-lg">
-              <h3 className="text-2xl font-bold text-red-600">{stat}</h3>
-              <p className="text-sm text-gray-600">{label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      
       <br/>
 
       

@@ -1,15 +1,50 @@
-import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo2.png';
 import { MdMenu, MdClose } from 'react-icons/md';
 import { IoMdArrowDropdown } from "react-icons/io";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userType, setUserType] = useState('');
+  const navigate = useNavigate();
   const toggleMenu = () => setIsOpen(!isOpen);
   const activeClass = "text-red-800";
   const inactiveClass = "text-gray-700 hover:text-red-700 transition-colors duration-200";
   const [isBloodDropdownOpen, setIsBloodDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    const userTypeFromStorage = localStorage.getItem('userType');
+    
+    if (token) {
+      setIsLoggedIn(true);
+      setUserType(userTypeFromStorage || '');
+    } else {
+      setIsLoggedIn(false);
+      setUserType('');
+    }
+  }, []);
+
+  const handleLogout = () => {
+    // Clear all stored data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('hospital');
+    localStorage.removeItem('userType');
+    
+    // Update state
+    setIsLoggedIn(false);
+    setUserType('');
+    
+    // Close mobile menu if open
+    setIsOpen(false);
+    
+    // Redirect to login page
+    navigate('/Login');
+  };
 
 
   return (
@@ -44,15 +79,22 @@ export default function Navbar() {
                 <NavLink to="/DBlood" className="px-4 py-2 hover:bg-red-100" onClick={() => setIsBloodDropdownOpen(false)}>
                   Donate Blood
                 </NavLink>
-                <NavLink to="/BloodB" className="px-4 py-2 hover:bg-red-100" onClick={() => setIsBloodDropdownOpen(false)}>
+                {/* <NavLink to="/BloodB" className="px-4 py-2 hover:bg-red-100" onClick={() => setIsBloodDropdownOpen(false)}>
                   Blood Bank
-                </NavLink>
+                </NavLink> */}
               </div>
             )}
           </div>
 
           <NavLink to="/Camp" className={({ isActive }) => isActive ? activeClass : inactiveClass}>Camp</NavLink>
-          <NavLink to="/Login" className={({ isActive }) => isActive ? activeClass : inactiveClass}>Login</NavLink>
+          {isLoggedIn && (
+            <button 
+              onClick={handleLogout}
+              className={`${inactiveClass} cursor-pointer`}
+            >
+              Logout
+            </button>
+          )}
         
         </div>
 
@@ -102,13 +144,13 @@ export default function Navbar() {
           Donate Blood
         </NavLink><br/>
 
-         <NavLink
+         {/* <NavLink
           to="/BloodB"
           onClick={() => setIsOpen(false)}
           className={({ isActive }) => isActive ? "text-red-800 font-bold uppercase" : "font-semibold text-stone-800 hover:underline uppercase"}
         >
           Blood Bank
-        </NavLink><br/>
+        </NavLink><br/> */}
 
         <NavLink
           to="/Camp"
@@ -118,13 +160,17 @@ export default function Navbar() {
           Camp
         </NavLink><br/>
 
-        <NavLink
-          to="/Login"
-          onClick={() => setIsOpen(false)}
-          className={({ isActive }) => isActive ? "text-red-800 font-bold uppercase" : " font-semibold text-stone-800 hover:underline uppercase"}
-        >
-          Login
-        </NavLink>
+        {isLoggedIn && (
+          <button
+            onClick={() => {
+              handleLogout();
+              setIsOpen(false);
+            }}
+            className="font-semibold text-stone-800 hover:underline uppercase cursor-pointer"
+          >
+            Logout
+          </button>
+        )}
     </div>
 )}
 

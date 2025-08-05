@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import axiosInstance from "../../axiosInstance";
 
 import { useState } from "react";
 export default function BloodbankSignup({ gotoBloodBank, goto }) {
@@ -11,7 +11,7 @@ export default function BloodbankSignup({ gotoBloodBank, goto }) {
     address: "",
     district: "",
     validDocuments: null,
-    phoneNumber: "",
+    phoneNumber: "", 
     email: "",
     password: "",
     confirmPassword: "",
@@ -59,11 +59,10 @@ export default function BloodbankSignup({ gotoBloodBank, goto }) {
       data.append("email", formData.email);
       data.append("password", formData.password);
 
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/register",
+      const res = await axiosInstance.post(
+        "/routeshospital/register",
         data,
         {
-          withCredentials: true,
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -94,7 +93,7 @@ export default function BloodbankSignup({ gotoBloodBank, goto }) {
           className="text-2xl font-bold text-center space-x-10 cursor-pointer"
           onClick={gotoBloodBank}
         >
-          Blood bank
+          Hospital
         </span>
       </div>
       <div>

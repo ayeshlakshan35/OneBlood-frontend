@@ -42,6 +42,7 @@ const DonorEligibility = () => {
 
   return (
     <div className="">
+      <Navbar />
       <section className="relative text-center mb-12 min-h-[400px] bg-red-400 py-12 rounded overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center opacity-30">
           <img src={er} className="w-full" />

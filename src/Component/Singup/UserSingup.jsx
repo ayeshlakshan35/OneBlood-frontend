@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../axiosInstance';
 
 export default function Signup({ gotoBloodBank, goto }) {
   const [error, setError] = useState("");
@@ -60,9 +60,7 @@ export default function Signup({ gotoBloodBank, goto }) {
    
 
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/register', formData, {
-        withCredentials: true
-      });
+      const res = await axiosInstance.post('/auth/register', formData);
       setSuccess(res.data.message || 'Registration successful!');
       setError("");
       // Delay redirect so user can see the success message
@@ -83,7 +81,7 @@ export default function Signup({ gotoBloodBank, goto }) {
           User
         </span>
         <span className='text-center text-gray-500 cursor-pointer' onClick={gotoBloodBank}>
-          Blood Bank
+          Hospital
         </span>
 
       </div>

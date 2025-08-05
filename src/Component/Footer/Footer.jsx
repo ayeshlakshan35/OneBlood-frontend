@@ -1,4 +1,6 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
+import logo from '../../assets/logo2.png';
 
 const Footer = () => {
   return (
@@ -7,7 +9,13 @@ const Footer = () => {
         
        
         <div>
-          <h2 className="text-lg font-semibold mb-2">OneBlood</h2>
+           {/* Clickable Logo */}
+        <NavLink to="/Home" className="flex items-center space-x-0.1">
+          <img src={logo} className="h-10 w-10" alt="logo" />
+          <span className="text-red-700 font-bold text-lg sm:text-xl">ne</span>
+          <span className='font-bold text-lg sm:text-xl'>Blood</span>
+        </NavLink>
+          
           <p className="text-gray-200">
             OneBlood is a not-for-profit blood center serving hospitals and patients across the Southeast. Every donation helps save up to three lives.
           </p>
@@ -17,10 +25,10 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-semibold mb-2">Quick Links</h3>
           <ul className="space-y-1 text-gray-200">
-            <li><a href="#" className="hover:underline">Donate Blood</a></li>
-            <li><a href="#" className="hover:underline">Find a Blood</a></li>
-            <li><a href="#" className="hover:underline">Blood Types</a></li>
-            <li><a href="#" className="hover:underline">Camps</a></li>
+            <li><a href="/DBlood" className="hover:underline">Donate Blood</a></li>
+            <li><a href="/FBlood" className="hover:underline">Find a Blood</a></li>
+
+            <li><a href="/Camp" className="hover:underline">Camps</a></li>
           </ul>
         </div>
 

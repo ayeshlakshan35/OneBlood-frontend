@@ -1,15 +1,19 @@
 import React, { useState } from "react";
-import axios from 'axios';
-import { useNavigate } from "react-router-dom"; // <-- Add this
+import axiosInstance from "../../axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 export default function Log({ goto }) {
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [userType, setUserType] = useState("user"); // "user" or "hospital"
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const navigate = useNavigate(); // <-- Initialize navigation
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.name === "email" ? e.target.value.toLowerCase().trim() : e.target.value.trim(),
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -17,20 +21,57 @@ export default function Log({ goto }) {
     setError("");
     setSuccess("");
 
+    if (!formData.email || !formData.password) {
+      setError("Email and password are required.");
+      return;
+    }
+
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", formData, {
-        withCredentials: true,
-      });
+      const loginUrl =
+        userType === "hospital"
+          ? "http://localhost:5000/api/routeshospital/login"
+          : "http://localhost:5000/api/auth/login";
+
+      console.log("Sending login request:", { url: loginUrl, data: formData });
+
+      const res = await axiosInstance.post(loginUrl.replace("http://localhost:5000/api", ""), formData);
 
       setSuccess("Login successful!");
-      console.log(res.data);
+      console.log("Login response:", res.data);
+      console.log("🔍 Debug - Login response keys:", Object.keys(res.data));
+      console.log("🔍 Debug - Token in response:", res.data.token ? "Yes" : "No");
 
-      // Redirect to home page after a short delay (optional)
+      // Store the token in localStorage
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("userType", userType);
+        console.log("🔍 Debug - Token stored:", res.data.token.substring(0, 20) + "...");
+        if (res.data.user) {
+          localStorage.setItem("user", JSON.stringify(res.data.user));
+        }
+        if (res.data.hospital) {
+          localStorage.setItem("hospital", JSON.stringify(res.data.hospital));
+        }
+        
+        // Verify token is stored before navigation
+        const storedToken = localStorage.getItem("token");
+        console.log("🔍 Debug - Token verification:", storedToken ? "Stored successfully" : "Failed to store");
+
       setTimeout(() => {
-        navigate("/home"); // Make sure you have a /home route in your app
-      }, 1000); // 1 second delay for user to see message
-
+          console.log("🔍 Debug - Navigating after login, userType:", userType);
+        if (userType === "hospital") {
+            console.log("🔍 Debug - Navigating to /BloodB");
+          navigate("/BloodB");
+        } else {
+            console.log("🔍 Debug - Navigating to /home");
+          navigate("/home");
+        }
+        }, 1500); // Increased delay to ensure token is stored
+      } else {
+        console.log("🔍 Debug - No token in response!");
+      }
     } catch (err) {
+      console.error("Login error:", err.response?.data, err);
       setError(err.response?.data?.message || "Login failed. Please try again.");
     }
   };
@@ -45,6 +86,18 @@ export default function Log({ goto }) {
         <h3 className="text-center text-gray-500">
           Use your email and password to sign in
         </h3>
+
+        <div>
+          <label className="block mb-1 font-medium">Login as:</label>
+          <select
+            value={userType}
+            onChange={(e) => setUserType(e.target.value)}
+            className="w-full p-2 border rounded mb-4"
+          >
+            <option value="user">User</option>
+            <option value="hospital">Hospital</option>
+          </select>
+        </div>
 
         <input
           className="w-full p-3 border rounded"
@@ -65,8 +118,6 @@ export default function Log({ goto }) {
           placeholder="Enter Your Password"
           required
         />
-
-        <br />
 
         <button
           type="submit"
