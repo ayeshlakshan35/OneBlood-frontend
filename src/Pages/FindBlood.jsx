@@ -19,27 +19,17 @@ const districts = [
 // Blood types (static)
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
-// Blood type color mapping
-const getBloodTypeColor = (bloodType) => {
-  const colorMap = {
-    'A+': 'bg-blue-50 text-blue-700 border-blue-200',
-    'A-': 'bg-blue-100 text-blue-800 border-blue-300',
-    'B+': 'bg-green-50 text-green-700 border-green-200',
-    'B-': 'bg-green-100 text-green-800 border-green-300',
-    'AB+': 'bg-purple-50 text-purple-700 border-purple-200',
-    'AB-': 'bg-purple-100 text-purple-800 border-purple-300',
-    'O+': 'bg-red-50 text-red-700 border-red-200',
-    'O-': 'bg-red-100 text-red-800 border-red-300',
-  };
-  return colorMap[bloodType] || 'bg-gray-50 text-gray-700 border-gray-200';
+// Simple blood type styling
+const getBloodTypeStyle = (bloodType) => {
+  return "bg-gray-50 text-gray-800 border-gray-200 hover:bg-gray-100";
 };
 
 // Get availability status
 const getAvailabilityStatus = (units) => {
-  if (units >= 20) return { status: 'High', color: 'text-green-600', bg: 'bg-green-100' };
-  if (units >= 10) return { status: 'Medium', color: 'text-yellow-600', bg: 'bg-yellow-100' };
-  if (units > 0) return { status: 'Low', color: 'text-red-600', bg: 'bg-red-100' };
-  return { status: 'Out', color: 'text-gray-500', bg: 'bg-gray-100' };
+  if (units >= 20) return { status: 'Available', color: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200' };
+  if (units >= 10) return { status: 'Limited', color: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-200' };
+  if (units > 0) return { status: 'Low Stock', color: 'text-orange-700', bg: 'bg-orange-50', border: 'border-orange-200' };
+  return { status: 'Unavailable', color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200' };
 };
 
 export default function FindBlood() {
@@ -48,22 +38,36 @@ export default function FindBlood() {
   const [selectedBloodType, setSelectedBloodType] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [loading, setLoading] = useState(true);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await axiosInstance.get("/bloodroutes/all-hospitals");
-        console.log("🔍 Debug - All hospitals data:", res.data);
-        setAllHospitals(res.data);
-        setFilteredHospitals(res.data);
-      } catch (err) {
-        console.error("❌ Error fetching hospital data:", err);
+        const response = await axiosInstance.get("/bloodroutes/all-hospitals");
+        console.log("🔍 Debug - All hospitals data:", response.data);
+        setAllHospitals(response.data);
+        setFilteredHospitals(response.data);
+      } catch (error) {
+        console.error("❌ Error fetching hospital data:", error);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
+  }, []);
+
+  // Preload background image
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => {
+      setImageLoaded(true);
+    };
+    img.onerror = () => {
+      console.error("❌ Failed to load background image: /child.png");
+      setImageLoaded(false);
+    };
+    img.src = "/child.png";
   }, []);
 
   useEffect(() => {
@@ -85,97 +89,72 @@ export default function FindBlood() {
   }, [selectedBloodType, selectedDistrict, allHospitals]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-red-50 via-white to-pink-50">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <Navbar />
 
       <main className="flex-grow pt-24 relative z-0">
-        {/* Hero Section */}
-        <div className="relative bg-gradient-to-br from-red-600 via-red-500 to-pink-600 text-white overflow-hidden -mt-24 pt-24">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <pattern id="medical-cross" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <rect x="8" y="0" width="4" height="20" fill="currentColor"/>
-                  <rect x="0" y="8" width="20" height="4" fill="currentColor"/>
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#medical-cross)"/>
-            </svg>
-          </div>
+        {/* Hero Section - With Background Image and Red Overlay */}
+        <div className="relative bg-white border-b border-gray-200 -mt-24 pt-24 overflow-hidden min-h-[500px]">
+          {/* Background Image - with fallback */}
+          {imageLoaded ? (
+            <div 
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500"
+              style={{
+                backgroundImage: `linear-gradient(rgba(156, 69, 69, 0.85), rgba(132, 46, 46, 0.9)), url('/child.png')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'  
+              }}
+            ></div>
+          ) : (
+            // Fallback gradient background if image doesn't load
+            <div className="absolute inset-0 bg-gradient-to-br from-red-100 via-red-50 to-pink-100"></div>
+          )}
           
-          {/* Floating Medical Icons */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-20 left-10 text-white opacity-20 text-4xl animate-pulse">🩸</div>
-            <div className="absolute top-32 right-20 text-white opacity-15 text-3xl animate-bounce" style={{animationDelay: '1s'}}>🏥</div>
-            <div className="absolute bottom-32 left-20 text-white opacity-20 text-3xl animate-pulse" style={{animationDelay: '2s'}}>❤️</div>
-            <div className="absolute bottom-20 right-32 text-white opacity-15 text-4xl animate-bounce" style={{animationDelay: '0.5s'}}>🩺</div>
-            <div className="absolute top-1/2 left-1/4 text-white opacity-10 text-5xl animate-pulse" style={{animationDelay: '1.5s'}}>+</div>
-            <div className="absolute top-1/3 right-1/4 text-white opacity-10 text-5xl animate-pulse" style={{animationDelay: '3s'}}>+</div>
-          </div>
+          {/* Red Overlay - adjusted opacity based on whether image loaded */}
+          <div className={`absolute inset-0 ${imageLoaded ? 'bg-red-600 bg-opacity-50' : 'bg-red-600 bg-opacity-80'}`}></div>
           
-          <div className="relative z-10 px-6 py-20">
-            <div className="max-w-4xl mx-auto text-center">
-              {/* Main Header */}
-              <div className="mb-8">
-                <h1 className="text-6xl md:text-7xl font-extrabold mb-6 leading-tight">
-                  Find Blood
-                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-white">
-                    Save Lives
-                  </span>
-                </h1>
-                <p className="text-xl md:text-2xl text-red-100 max-w-3xl mx-auto leading-relaxed">
-                  Connect with hospitals and blood banks across Sri Lanka. Every search brings hope to someone in need.
-                </p>
-              </div>
+          {/* Content */}
+          <div className="relative z-10 max-w-6xl mx-auto px-6 py-16">
+            <div className="text-center">
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
+                Find Blood Donors
+              </h1>
+              <p className="text-xl text-white max-w-3xl mx-auto mb-8 drop-shadow-md">
+                Connect with hospitals and blood banks across Sri Lanka to find the blood type you need.
+              </p>
               
-              {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white bg-opacity-15 backdrop-blur-sm rounded-2xl p-6 border border-white border-opacity-20">
-                  <div className="text-3xl font-bold text-red-900 mb-2">500+</div>
-                  <div className="text-red-400 font-medium">Hospitals Connected</div>
+              {/* Simple Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                <div className="bg-white bg-opacity-20 backdrop-blur-sm border border-white border-opacity-30 rounded-lg p-6 shadow-lg">
+                  <div className="text-2xl font-bold text-black mb-2 drop-shadow-sm">500+</div>
+                  <div className="text-red-500 drop-shadow-sm">Hospitals Connected</div>
                 </div>
-                <div className="bg-white bg-opacity-15 backdrop-blur-sm rounded-2xl p-6 border border-white border-opacity-20">
-                  <div className="text-3xl font-bold text-red-900 mb-2">24/7</div>
-                  <div className="text-red-400 font-medium">Emergency Support</div>
+                <div className="bg-white bg-opacity-20 backdrop-blur-sm border border-white border-opacity-30 rounded-lg p-6 shadow-lg">
+                  <div className="text-2xl font-bold text-black mb-2 drop-shadow-sm">24/7</div>
+                  <div className="text-red-500 drop-shadow-sm">Emergency Support</div>
                 </div>
-                <div className="bg-white bg-opacity-15 backdrop-blur-sm rounded-2xl p-6 border border-white border-opacity-20">
-                  <div className="text-3xl font-bold text-red-900 mb-2">10K+</div>
-                  <div className="text-red-400 font-medium">Lives Saved</div>
+                <div className="bg-white bg-opacity-20 backdrop-blur-sm border border-white border-opacity-30 rounded-lg p-6 shadow-lg">
+                  <div className="text-2xl font-bold text-black mb-2 drop-shadow-sm">10,000+</div>
+                  <div className="text-red-500 drop-shadow-sm">Lives Saved</div>
                 </div>
-              </div>
-              
-              {/* Call to Action */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <button className="px-8 py-4 bg-white text-red-600 rounded-2xl font-bold text-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                  🔍 Start Searching
-                </button>
-                <button className="px-8 py-4 border-2 border-white text-white rounded-2xl font-bold text-lg hover:bg-white hover:text-red-600 transition-all duration-300 transform hover:scale-105">
-                  📞 Emergency Contact
-                </button>
               </div>
             </div>
           </div>
-          
-          {/* Bottom Wave */}
-          <div className="absolute bottom-0 left-0 w-full">
-            <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-full h-16">
-              <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" className="fill-red-50"></path>
-            </svg>
-          </div>
         </div>
         
-        {/* Content Section with proper spacing */}
-        <div className="px-6 py-16 -mt-1">
-
+        {/* Content Section */}
+        <div className="max-w-6xl mx-auto px-6 py-12">
           {/* Search Filters */}
-          <div className="max-w-5xl mx-auto mb-12">
-          <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Search Filters</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700">Blood Type</label>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Blood Type
+                </label>
                 <select
-                  className="w-full px-6 py-4 rounded-2xl border-2 border-gray-200 focus:border-red-400 focus:ring-2 focus:ring-red-100 outline-none transition-all duration-300 bg-gray-50 hover:bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
                   value={selectedBloodType}
                   onChange={(e) => setSelectedBloodType(e.target.value)}
                 >
@@ -188,10 +167,12 @@ export default function FindBlood() {
                 </select>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700">District</label>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  District
+                </label>
                 <select
-                  className="w-full px-6 py-4 rounded-2xl border-2 border-gray-200 focus:border-red-400 focus:ring-2 focus:ring-red-100 outline-none transition-all duration-300 bg-gray-50 hover:bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
                   value={selectedDistrict}
                   onChange={(e) => setSelectedDistrict(e.target.value)}
                 >
@@ -207,29 +188,28 @@ export default function FindBlood() {
 
             {/* Clear Filters */}
             {(selectedBloodType || selectedDistrict) && (
-              <div className="mt-6 text-center">
+              <div className="mt-6 pt-4 border-t border-gray-200">
                 <button
                   onClick={() => {
                     setSelectedBloodType("");
                     setSelectedDistrict("");
                   }}
-                  className="px-8 py-3 text-red-600 border-2 border-red-200 rounded-full hover:bg-red-50 hover:border-red-300 transition-all duration-300 font-semibold"
+                  className="px-4 py-2 text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
                 >
                   Clear All Filters
                 </button>
               </div>
             )}
           </div>
-        </div>
 
           {/* Results Summary */}
           {(selectedBloodType || selectedDistrict) && (
-            <div className="max-w-5xl mx-auto mb-8 text-center">
-              <div className="bg-white rounded-2xl p-4 shadow-md inline-block">
-                <p className="text-gray-700 font-medium">
-                  Found <span className="text-red-600 font-bold">{filteredHospitals.length}</span> of {allHospitals.length} hospitals
-                  {selectedBloodType && <span className="text-blue-600"> with {selectedBloodType}</span>}
-                  {selectedDistrict && <span className="text-green-600"> in {selectedDistrict}</span>}
+            <div className="mb-6 text-center">
+              <div className="inline-block bg-white rounded-lg border border-gray-200 px-4 py-2">
+                <p className="text-gray-700">
+                  Showing <span className="font-semibold text-red-600">{filteredHospitals.length}</span> of {allHospitals.length} hospitals
+                  {selectedBloodType && <span className="text-gray-900"> with {selectedBloodType}</span>}
+                  {selectedDistrict && <span className="text-gray-900"> in {selectedDistrict}</span>}
                 </p>
               </div>
             </div>
@@ -237,25 +217,27 @@ export default function FindBlood() {
 
           {/* Loading State */}
           {loading && (
-            <div className="text-center py-20">
+            <div className="text-center py-12">
               <div className="inline-flex items-center space-x-3">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-                <p className="text-gray-600 font-medium">Loading hospitals...</p>
+                <div className="w-6 h-6 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-gray-600">Loading hospitals...</p>
               </div>
             </div>
           )}
 
           {/* Hospital Cards */}
           {!loading && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredHospitals.length === 0 ? (
-                <div className="col-span-full text-center py-20">
-                  <div className="bg-white rounded-3xl p-12 shadow-xl max-w-md mx-auto">
-                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
-                      🏥
+                <div className="col-span-full text-center py-12">
+                  <div className="bg-white rounded-lg border border-gray-200 p-12 max-w-md mx-auto">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-3">No Hospitals Found</h3>
-                    <p className="text-gray-500 mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No Hospitals Found</h3>
+                    <p className="text-gray-600 mb-4">
                       No hospitals match your search criteria. Try adjusting your filters.
                     </p>
                     <button
@@ -263,7 +245,7 @@ export default function FindBlood() {
                         setSelectedBloodType("");
                         setSelectedDistrict("");
                       }}
-                      className="px-6 py-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-semibold"
+                      className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                     >
                       Show All Hospitals
                     </button>
@@ -273,70 +255,60 @@ export default function FindBlood() {
                 filteredHospitals.map((hospital, index) => (
                   <div
                     key={index}
-                    className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden transform hover:-translate-y-2"
+                    className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
                   >
                     {/* Hospital Header */}
-                    <div className="bg-gradient-to-r from-red-500 to-pink-500 p-6 text-white">
-                      <div className="flex items-center justify-between">
-                        <div className="w-14 h-14 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center text-2xl backdrop-blur-sm">
-                          🏥
+                    <div className="p-6 border-b border-gray-200">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            {hospital.hospitalName}
+                          </h3>
+                          <div className="flex items-center text-gray-600">
+                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-sm">{hospital.district}</span>
+                          </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm opacity-90">Available Now</div>
-                          <div className="text-lg font-bold">{hospital.bloodData.length} Types</div>
-                        </div>
-                      </div>
-                      <div className="mt-4">
-                        <h2 className="text-xl font-bold mb-1 group-hover:text-yellow-200 transition-colors">
-                          {hospital.hospitalName}
-                        </h2>
-                        <div className="flex items-center text-red-100">
-                          <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                          </svg>
-                          <span className="text-sm">{hospital.district}</span>
+                          <div className="text-sm text-gray-500">Available Types</div>
+                          <div className="text-xl font-semibold text-red-600">{hospital.bloodData?.length || 0}</div>
                         </div>
                       </div>
                     </div>
 
                     {/* Blood Types Section */}
                     <div className="p-6">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                        Blood Availability
-                      </h3>
+                      <h4 className="text-sm font-medium text-gray-900 mb-4">Blood Availability</h4>
                       
-                      <div className="grid grid-cols-2 gap-3">
-                        {hospital.bloodData.map((blood, i) => {
+                      <div className="space-y-3">
+                        {hospital.bloodData?.map((blood, i) => {
                           const availability = getAvailabilityStatus(blood.totalUnits);
                           return (
                             <div
                               key={i}
-                              className={`${getBloodTypeColor(blood.bloodType)} p-4 rounded-2xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-md`}
+                              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
                             >
-                              <div className="flex justify-between items-center">
-                                <div className="font-bold text-lg">{blood.bloodType}</div>
-                                <div className={`px-2 py-1 rounded-full text-xs font-semibold ${availability.bg} ${availability.color}`}>
-                                  {availability.status}
+                              <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 bg-white border border-gray-300 rounded-lg flex items-center justify-center">
+                                  <span className="font-bold text-red-600 text-sm">{blood.bloodType}</span>
+                                </div>
+                                <div>
+                                  <div className="font-medium text-gray-900">{blood.totalUnits} units</div>
                                 </div>
                               </div>
-                              <div className="mt-2 text-sm opacity-80">
-                                {blood.totalUnits} units
-                              </div>
-                              <div className="mt-2 bg-white bg-opacity-50 rounded-full h-2">
-                                <div 
-                                  className="h-2 rounded-full bg-current opacity-60 transition-all duration-500"
-                                  style={{ width: `${Math.min((blood.totalUnits / 50) * 100, 100)}%` }}
-                                ></div>
+                              <div className={`px-3 py-1 rounded-full text-xs font-medium ${availability.bg} ${availability.color} ${availability.border} border`}>
+                                {availability.status}
                               </div>
                             </div>
                           );
                         })}
                       </div>
 
-                      {/* Contact Section */}
-                      <div className="mt-6 pt-4 border-t border-gray-100">
-                        <button className="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white py-3 rounded-2xl font-semibold hover:from-red-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg">
+                      {/* Contact Button */}
+                      <div className="mt-6 pt-4 border-t border-gray-200">
+                        <button className="w-full bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700 transition-colors">
                           Contact Hospital
                         </button>
                       </div>

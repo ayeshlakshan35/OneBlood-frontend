@@ -48,7 +48,7 @@ export default function Navbar() {
 
 
   return (
-    <nav className="bg-white shadow-md w-full sticky top-0 z-10 ">
+    <nav className="bg-white shadow-md w-full sticky fixed top-0 left-0 right-0 w-full bg-white shadow-lg z-50 border-b border-stone-200 ">
       <div className="flex flex-wrap items-center justify-between w-full px-4 py-3">
 
       {/* Clickable Logo */}
