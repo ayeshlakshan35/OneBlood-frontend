@@ -14,7 +14,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-screen bg-white overflow-hidden">
+    <section className="relative min-h-screen bg-white overflow-hidden pt-[80px]">
       {/* Background Image */}
       <div className="absolute opacity-80 inset-0">
         <img 
@@ -29,7 +29,7 @@ export default function HeroSection() {
       {/* Content Container */}
       <div className="relative z-10 flex items-center justify-end min-h-screen px-8 lg:px-16">
         <div className="opacity-80 max-w-xl text-right">
-          <h1 className="text-5xl lg:text-6xl font-bold text-gray-800 mb-6 leading-tight">
+          <h1 className="text-5xl lg:text-6xl font-bold text-black mb-6 leading-tight">
             Donate Blood, <span className="text-red-600">Save Lives</span>
           </h1>
          
@@ -52,4 +52,4 @@ export default function HeroSection() {
       </div>
     </section>
   );
-} 
+}
