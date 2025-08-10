@@ -1,12 +1,27 @@
 import Navbar from "../Component/Navbar/Navbar";
 import React, { useState } from "react";
 import Footer from "../Component/Footer/Footer";
+
 import er from "../assets/ab.png";
 
+
+import axiosInstance from '../axiosInstance';
+
 const DonorEligibility = () => {
+  const [formData, setFormData] = useState({
+    bloodType: "",
+    district: "",
+    ageCriteria: false,
+    donationGap: false,
+    hemoglobin: false,
+    healthCondition: false,
+    identityProof: null,
+  });
+
   const isFormValid = () => {
     return (
       formData.bloodType &&
+      formData.district &&
       formData.ageCriteria &&
       formData.donationGap &&
       formData.hemoglobin &&
@@ -15,32 +30,61 @@ const DonorEligibility = () => {
     );
   };
 
-  const [formData, setFormData] = useState({
-    bloodType: "",
-    ageCriteria: false,
-    donationGap: false,
-    hemoglobin: false,
-    healthCondition: false,
-    identityProof: null,
-  });
-
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
-    if (type === "checkbox") {
-      setFormData({ ...formData, [name]: checked });
-    } else if (type === "file") {
-      setFormData({ ...formData, [name]: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        type === "checkbox" ? checked : type === "file" ? files[0] : value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!isFormValid()) {
+      alert("Please fill out all fields correctly.");
+      return;
+    }
+
+    try {
+      const data = new FormData();
+      data.append("bloodType", formData.bloodType);
+      data.append("district", formData.district);
+      data.append("ageCriteria", formData.ageCriteria);
+      data.append("donationGap", formData.donationGap);
+      data.append("hemoglobin", formData.hemoglobin);
+      data.append("healthCondition", formData.healthCondition);
+      data.append("identityProof", formData.identityProof);
+
+      const response = await axiosInstance.post("/donors/add-donor", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      alert(response.data.message || "Donor eligibility submitted successfully!");
+
+      setFormData({
+        bloodType: "",
+        district: "",
+        ageCriteria: false,
+        donationGap: false,
+        hemoglobin: false,
+        healthCondition: false,
+        identityProof: null,
+      });
+    } catch (error) {
+      console.error(error);
+      alert(
+        error.response?.data?.message ||
+          "Something went wrong while submitting the form."
+      );
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
-  };
-
   return (
+
     <div className="bg-gray-50 min-h-screen">
       <Navbar />
 
@@ -49,6 +93,7 @@ const DonorEligibility = () => {
         <div className="absolute inset-0">
           <img src={er} className="w-full h-full object-cover object-center" alt="Donate Blood" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-red-600/50"></div>
+
         </div>
         <div className="relative z-10 flex flex-col items-center justify-center h-full p-6">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
@@ -101,11 +146,12 @@ const DonorEligibility = () => {
           <div className="p-4 bg-gray-50 rounded-xl hover:shadow-lg transition">
             <strong className="block text-red-600 mb-1">Directed</strong>
             <p>Donation for a specific patient's medical need.</p>
+
           </div>
         </div>
       </section>
 
-      {/* Form */}
+
       <form
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-2xl shadow-md max-w-5xl mb-16 mx-auto px-4"
@@ -113,7 +159,9 @@ const DonorEligibility = () => {
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Eligibility Form</h2>
 
         {/* Blood Type */}
+
         <label className="block mb-4 font-medium text-gray-700">
+
           Select Blood Type
           <select
             name="bloodType"
@@ -128,6 +176,7 @@ const DonorEligibility = () => {
             ))}
           </select>
         </label>
+
 
         {/* Checkboxes */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -148,6 +197,90 @@ const DonorEligibility = () => {
               {item.label}
             </label>
           ))}
+
+        <label className="block mb-3">
+          Select District
+          <select
+            name="district"
+            value={formData.district}
+            onChange={handleChange}
+            className="block w-full border rounded mt-1 p-2"
+            required
+          >
+            <option value="">Choose your district</option>
+            <option value="Ampara">Ampara</option>
+            <option value="Anuradhapura">Anuradhapura</option>
+            <option value="Badulla">Badulla</option>
+            <option value="Batticaloa">Batticaloa</option>
+            <option value="Colombo">Colombo</option>
+            <option value="Galle">Galle</option>
+            <option value="Gampaha">Gampaha</option>
+            <option value="Hambantota">Hambantota</option>
+            <option value="Jaffna">Jaffna</option>
+            <option value="Kalutara">Kalutara</option>
+            <option value="Kandy">Kandy</option>
+            <option value="Kegalle">Kegalle</option>
+            <option value="Kilinochchi">Kilinochchi</option>
+            <option value="Kurunegala">Kurunegala</option>
+            <option value="Mannar">Mannar</option>
+            <option value="Matale">Matale</option>
+            <option value="Matara">Matara</option>
+            <option value="Monaragala">Monaragala</option>
+            <option value="Mullaitivu">Mullaitivu</option>
+            <option value="Nuwara Eliya">Nuwara Eliya</option>
+            <option value="Polonnaruwa">Polonnaruwa</option>
+            <option value="Puttalam">Puttalam</option>
+            <option value="Ratnapura">Ratnapura</option>
+            <option value="Trincomalee">Trincomalee</option>
+            <option value="Vavuniya">Vavuniya</option>
+          </select>
+        </label>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="ageCriteria"
+              checked={formData.ageCriteria}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            I meet the age criteria (18–60 years)
+          </label>
+
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="donationGap"
+              checked={formData.donationGap}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            4 months gap since last donation
+          </label>
+
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="hemoglobin"
+              checked={formData.hemoglobin}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            Hemoglobin level above 12g/dL
+          </label>
+
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="healthCondition"
+              checked={formData.healthCondition}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            Free from serious conditions/pregnancy
+          </label>
+
         </div>
 
         {/* File Upload */}
@@ -176,7 +309,9 @@ const DonorEligibility = () => {
         <button
           type="submit"
           disabled={!isFormValid()}
+
           className={`w-full py-3 rounded-lg text-white font-semibold transition ${
+
             isFormValid()
               ? "bg-red-600 hover:bg-red-700"
               : "bg-gray-400 cursor-not-allowed"
