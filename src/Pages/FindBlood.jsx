@@ -30,7 +30,6 @@ export default function FindBlood() {
     const fetchData = async () => {
       try {
         const res = await axiosInstance.get("/bloodroutes/all-hospitals");
-        console.log("🔍 Debug - All hospitals data:", res.data);
         setAllHospitals(res.data);
         setFilteredHospitals(res.data);
       } catch (err) {
@@ -59,19 +58,26 @@ export default function FindBlood() {
   }, [selectedBloodType, selectedDistrict, allHospitals]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-white via-red-50 to-white">
       <Navbar />
 
-      <main className="flex-grow bg-gradient-to-br from-red-50 to-white py-14 px-6">
-        <h1 className="text-4xl font-extrabold text-center text-red-700 mb-10">
-          🏥 Search Blood Availability
-        </h1>
+      {/* Added pt-20 or pt-24 to account for navbar height */}
+      <main className="flex-grow py-14 px-6 pt-20">
+        {/* Page Title */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-red-700 mb-3">
+            🏥 Find Blood Availability
+          </h1>
+          <p className="text-gray-500 text-lg">
+            Search by <span className="text-red-600 font-medium">Blood Type</span> and <span className="text-red-600 font-medium">District</span>
+          </p>
+        </div>
 
         {/* Filters */}
-        <div className="max-w-4xl mx-auto mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div className="max-w-4xl mx-auto mb-12 bg-white rounded-2xl shadow-lg p-6 border border-red-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <select
-              className="px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-red-400 outline-none"
+              className="px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 focus:ring-2 focus:ring-red-400 outline-none"
               value={selectedBloodType}
               onChange={(e) => setSelectedBloodType(e.target.value)}
             >
@@ -84,7 +90,7 @@ export default function FindBlood() {
             </select>
 
             <select
-              className="px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-red-400 outline-none"
+              className="px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 focus:ring-2 focus:ring-red-400 outline-none"
               value={selectedDistrict}
               onChange={(e) => setSelectedDistrict(e.target.value)}
             >
@@ -105,7 +111,7 @@ export default function FindBlood() {
                   setSelectedBloodType("");
                   setSelectedDistrict("");
                 }}
-                className="px-6 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+                className="px-6 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
               >
                 Clear Filters
               </button>
@@ -117,7 +123,8 @@ export default function FindBlood() {
         {(selectedBloodType || selectedDistrict) && (
           <div className="max-w-4xl mx-auto mb-6 text-center">
             <p className="text-gray-600">
-              Showing {filteredHospitals.length} of {allHospitals.length} hospitals
+              Showing <span className="font-semibold">{filteredHospitals.length}</span> of{" "}
+              <span className="font-semibold">{allHospitals.length}</span> hospitals
               {selectedBloodType && ` with ${selectedBloodType}`}
               {selectedDistrict && ` in ${selectedDistrict}`}
             </p>
@@ -125,9 +132,9 @@ export default function FindBlood() {
         )}
 
         {/* Hospital Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
           {filteredHospitals.length === 0 ? (
-            <div className="col-span-full text-center py-12">
+            <div className="col-span-full text-center py-12 bg-white rounded-xl shadow-md border border-red-100">
               <p className="text-gray-500 text-lg mb-2">
                 No matching hospitals found.
               </p>
@@ -139,13 +146,13 @@ export default function FindBlood() {
             filteredHospitals.map((hospital, index) => (
               <div
                 key={index}
-                className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-red-100 p-6 flex flex-col items-center"
+                className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-red-100 p-6 flex flex-col items-center group"
               >
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-5 text-red-600 text-3xl shadow-inner">
+                <div className="w-16 h-16 bg-gradient-to-br from-red-200 to-red-100 rounded-full flex items-center justify-center mb-5 text-red-600 text-3xl shadow-inner group-hover:scale-110 transition-transform duration-300">
                   🩸
                 </div>
 
-                <h2 className="text-xl font-semibold text-center text-gray-800 mb-1">
+                <h2 className="text-xl font-semibold text-center text-gray-800 mb-1 group-hover:text-red-600 transition-colors">
                   {hospital.hospitalName}
                 </h2>
                 <p className="text-sm text-gray-500 text-center mb-3">
@@ -156,7 +163,7 @@ export default function FindBlood() {
                   {hospital.bloodData.map((blood, i) => (
                     <div
                       key={i}
-                      className="bg-red-50 text-red-700 text-sm font-medium px-4 py-1.5 rounded-full border border-red-200 shadow-sm"
+                      className="bg-red-50 text-red-700 text-sm font-medium px-4 py-1.5 rounded-full border border-red-200 shadow-sm group-hover:bg-red-100 transition-colors"
                     >
                       {blood.bloodType}: {blood.totalUnits} units
                     </div>
