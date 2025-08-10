@@ -3,9 +3,7 @@ import React, { useState, useEffect } from "react";
 import Footer from "../Component/Footer/Footer";
 
 import er from "../assets/ab.png";
-
-
-import axiosInstance from '../axiosInstance';
+import axiosInstance from "../axiosInstance";
 import DonorStatusCheck from "../Component/DonorStatus/DonorStatusCheck";
 
 const DonorEligibility = () => {
@@ -23,11 +21,13 @@ const DonorEligibility = () => {
     donorEmail: "",
   });
 
-  // Fetch hospitals on component mount
+  // Fetch hospitals
   useEffect(() => {
     const fetchHospitals = async () => {
       try {
-        const response = await axiosInstance.get("/routeshospital/all-hospitals");
+        const response = await axiosInstance.get(
+          "/routeshospital/all-hospitals"
+        );
         setHospitals(response.data);
       } catch (error) {
         console.error("Error fetching hospitals:", error);
@@ -69,16 +69,9 @@ const DonorEligibility = () => {
 
     try {
       const data = new FormData();
-      data.append("bloodType", formData.bloodType);
-      data.append("hospital", formData.hospital);
-      data.append("ageCriteria", formData.ageCriteria);
-      data.append("donationGap", formData.donationGap);
-      data.append("hemoglobin", formData.hemoglobin);
-      data.append("healthCondition", formData.healthCondition);
-      data.append("identityProof", formData.identityProof);
-      data.append("donorName", formData.donorName);
-      data.append("donorPhone", formData.donorPhone);
-      data.append("donorEmail", formData.donorEmail);
+      Object.keys(formData).forEach((key) => {
+        data.append(key, formData[key]);
+      });
 
       const response = await axiosInstance.post("/donors/add-donor", data, {
         headers: {
@@ -86,9 +79,10 @@ const DonorEligibility = () => {
         },
       });
 
-      alert(response.data.message || "Donor eligibility submitted successfully!");
+      alert(
+        response.data.message || "Donor eligibility submitted successfully!"
+      );
 
-      // Save donor phone to localStorage for automatic notifications
       localStorage.setItem("donorPhone", formData.donorPhone);
 
       setFormData({
@@ -113,16 +107,18 @@ const DonorEligibility = () => {
   };
 
   return (
-
     <div className="bg-gray-50 min-h-screen">
       <Navbar />
 
-      {/* Hero Section - Added pt-20 to account for navbar */}
+      {/* Hero Section */}
       <section className="relative text-center mb-12 min-h-[600px] rounded-b-[40px] overflow-hidden pt-20">
         <div className="absolute inset-0">
-          <img src={er} className="w-full h-full object-cover object-center" alt="Donate Blood" />
+          <img
+            src={er}
+            className="w-full h-full object-cover object-center"
+            alt="Donate Blood"
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-red-600/50"></div>
-
         </div>
         <div className="relative z-10 flex flex-col items-center justify-center h-full p-6">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
@@ -134,34 +130,17 @@ const DonorEligibility = () => {
         </div>
       </section>
 
-      {/* Eligibility Info */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-5xl mx-auto px-4">
-        <div className="bg-gradient-to-br from-green-50 to-white p-6 rounded-2xl shadow-md hover:shadow-xl transition">
-          <h2 className="font-bold text-xl mb-4 text-green-700">✅ Who Can Donate?</h2>
-          <ul className="space-y-2 text-gray-700">
-            <li>• Age above 18 and below 60 years</li>
-            <li>• At least 4 months since last donation</li>
-            <li>• Hemoglobin level above 12g/dL</li>
-            <li>• No serious medical conditions or pregnancy</li>
-            <li>• Valid identity proof</li>
-          </ul>
-        </div>
-        <div className="bg-gradient-to-br from-red-50 to-white p-6 rounded-2xl shadow-md hover:shadow-xl transition">
-          <h2 className="font-bold text-xl mb-4 text-red-700">⚠️ Risk Behaviors (Disqualified)</h2>
-          <ul className="space-y-2 text-gray-700">
-            <li>• Sex workers or their clients</li>
-            <li>• Drug addicts</li>
-            <li>• Engaging in sex with multiple partners</li>
-          </ul>
-        </div>
-      </section>
 
       {/* Types of Donors */}
       <section className="bg-white p-8 max-w-5xl mx-auto rounded-2xl shadow-md mb-12 px-4">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Types of Donors</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+          Types of Donors
+        </h2>
         <div className="grid gap-6 md:grid-cols-2">
           <div className="p-4 bg-gray-50 rounded-xl hover:shadow-lg transition">
-            <strong className="block text-red-600 mb-1">Voluntary (Most Encouraged)</strong>
+            <strong className="block text-red-600 mb-1">
+              Voluntary (Most Encouraged)
+            </strong>
             <p>Safest and most encouraged form of donation. No payment involved.</p>
           </div>
           <div className="p-4 bg-gray-50 rounded-xl hover:shadow-lg transition">
@@ -175,22 +154,21 @@ const DonorEligibility = () => {
           <div className="p-4 bg-gray-50 rounded-xl hover:shadow-lg transition">
             <strong className="block text-red-600 mb-1">Directed</strong>
             <p>Donation for a specific patient's medical need.</p>
-
           </div>
         </div>
       </section>
 
-
+      {/* Eligibility Form */}
       <form
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-2xl shadow-md max-w-5xl mb-16 mx-auto px-4"
       >
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Eligibility Form</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+          Eligibility Form
+        </h2>
 
         {/* Blood Type */}
-
         <label className="block mb-4 font-medium text-gray-700">
-
           Select Blood Type
           <select
             name="bloodType"
@@ -201,21 +179,25 @@ const DonorEligibility = () => {
           >
             <option value="">Choose your blood type</option>
             {["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"].map((type) => (
-              <option key={type} value={type}>{type}</option>
+              <option key={type} value={type}>
+                {type}
+              </option>
             ))}
           </select>
         </label>
-
 
         {/* Checkboxes */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           {[
             { name: "ageCriteria", label: "I meet the age criteria (18–60 years)" },
             { name: "donationGap", label: "4 months gap since last donation" },
-            { name: "hemoglobin", label: "Hemoglobin level above 12g/dL" },
-            { name: "healthCondition", label: "Free from serious conditions/pregnancy" }
+            { name: "hemoglobin", label: "Hemoglobin level &gt; 12g/dL" },
+            { name: "healthCondition", label: "Free from serious conditions/pregnancy" },
           ].map((item) => (
-            <label key={item.name} className="flex items-center bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100 transition">
+            <label
+              key={item.name}
+              className="flex items-center bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100 transition"
+            >
               <input
                 type="checkbox"
                 name={item.name}
@@ -226,7 +208,9 @@ const DonorEligibility = () => {
               {item.label}
             </label>
           ))}
+        </div>
 
+        {/* Hospital */}
         <label className="block mb-3">
           Select Hospital
           <select
@@ -286,53 +270,6 @@ const DonorEligibility = () => {
           />
         </label>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              name="ageCriteria"
-              checked={formData.ageCriteria}
-              onChange={handleChange}
-              className="mr-2"
-            />
-            I meet the age criteria (18–60 years)
-          </label>
-
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              name="donationGap"
-              checked={formData.donationGap}
-              onChange={handleChange}
-              className="mr-2"
-            />
-            4 months gap since last donation
-          </label>
-
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              name="hemoglobin"
-              checked={formData.hemoglobin}
-              onChange={handleChange}
-              className="mr-2"
-            />
-            Hemoglobin level above 12g/dL
-          </label>
-
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              name="healthCondition"
-              checked={formData.healthCondition}
-              onChange={handleChange}
-              className="mr-2"
-            />
-            Free from serious conditions/pregnancy
-          </label>
-
-        </div>
-
         {/* File Upload */}
         <label className="block mb-6 font-medium text-gray-700">
           Identity Proof
@@ -359,9 +296,7 @@ const DonorEligibility = () => {
         <button
           type="submit"
           disabled={!isFormValid()}
-
           className={`w-full py-3 rounded-lg text-white font-semibold transition ${
-
             isFormValid()
               ? "bg-red-600 hover:bg-red-700"
               : "bg-gray-400 cursor-not-allowed"
