@@ -2,11 +2,23 @@ import Navbar from "../Component/Navbar/Navbar";
 import React, { useState } from "react";
 import Footer from "../Component/Footer/Footer";
 import er from "../assets/er.png";
+import axiosInstance from '../axiosInstance';
 
 const DonorEligibility = () => {
+  const [formData, setFormData] = useState({
+    bloodType: "",
+    district: "",
+    ageCriteria: false,
+    donationGap: false,
+    hemoglobin: false,
+    healthCondition: false,
+    identityProof: null,
+  });
+
   const isFormValid = () => {
     return (
       formData.bloodType &&
+      formData.district &&
       formData.ageCriteria &&
       formData.donationGap &&
       formData.hemoglobin &&
@@ -15,37 +27,65 @@ const DonorEligibility = () => {
     );
   };
 
-  const [formData, setFormData] = useState({
-    bloodType: "",
-    ageCriteria: false,
-    donationGap: false,
-    hemoglobin: false,
-    healthCondition: false,
-    identityProof: null,
-  });
-
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
-    if (type === "checkbox") {
-      setFormData({ ...formData, [name]: checked });
-    } else if (type === "file") {
-      setFormData({ ...formData, [name]: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        type === "checkbox" ? checked : type === "file" ? files[0] : value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!isFormValid()) {
+      alert("Please fill out all fields correctly.");
+      return;
+    }
+
+    try {
+      const data = new FormData();
+      data.append("bloodType", formData.bloodType);
+      data.append("district", formData.district);
+      data.append("ageCriteria", formData.ageCriteria);
+      data.append("donationGap", formData.donationGap);
+      data.append("hemoglobin", formData.hemoglobin);
+      data.append("healthCondition", formData.healthCondition);
+      data.append("identityProof", formData.identityProof);
+
+      const response = await axiosInstance.post("/donors/add-donor", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      alert(response.data.message || "Donor eligibility submitted successfully!");
+
+      setFormData({
+        bloodType: "",
+        district: "",
+        ageCriteria: false,
+        donationGap: false,
+        hemoglobin: false,
+        healthCondition: false,
+        identityProof: null,
+      });
+    } catch (error) {
+      console.error(error);
+      alert(
+        error.response?.data?.message ||
+          "Something went wrong while submitting the form."
+      );
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
-  };
-
   return (
-    <div className="">
+    <div>
       <Navbar />
       <section className="relative text-center mb-12 min-h-[400px] bg-red-400 py-12 rounded overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center opacity-30">
-          <img src={er} className="w-full" />
+          <img src={er} className="w-full" alt="Emergency" />
         </div>
         <div className="absolute inset-0 bg-black opacity-40"></div>
         <div className="relative z-10">
@@ -85,21 +125,25 @@ const DonorEligibility = () => {
         <h2 className="text-xl font-semibold mb-3 text-center">
           Types of Donors
         </h2>
-        <div className="list-disc pl-5 text-gray-700">
-          <strong>Voluntary (Most Encouraged)</strong>
-          <p>
-            Safest and most encouraged form of donation. No payment involved.
-          </p>
-          <strong>Replacement</strong>
-          <p>Donation for family members or friends in need.</p>
-          <strong>Paid</strong>
-          <p>Donation with monetary compensation.</p>
-          <strong>Directed</strong>
-          <p>Donation for a specific patient’s medical need.</p>
+        <div className="list-disc pl-5 text-gray-700 space-y-3">
+          <div>
+            <strong>Voluntary (Most Encouraged)</strong>
+            <p>Safest and most encouraged form of donation. No payment involved.</p>
+          </div>
+          <div>
+            <strong>Replacement</strong>
+            <p>Donation for family members or friends in need.</p>
+          </div>
+          <div>
+            <strong>Paid</strong>
+            <p>Donation with monetary compensation.</p>
+          </div>
+          <div>
+            <strong>Directed</strong>
+            <p>Donation for a specific patient’s medical need.</p>
+          </div>
         </div>
       </section>
-
-      <section className="p-6 max-w-4x5 max-h-6 mx-auto"></section>
 
       <form
         onSubmit={handleSubmit}
@@ -109,6 +153,7 @@ const DonorEligibility = () => {
           Eligibility Form
         </h2>
 
+        {/* Blood Type */}
         <label className="block mb-3">
           Select Blood Type
           <select
@@ -127,6 +172,45 @@ const DonorEligibility = () => {
             <option value="O-">O-</option>
             <option value="AB+">AB+</option>
             <option value="AB-">AB-</option>
+          </select>
+        </label>
+
+        {/* District */}
+        <label className="block mb-3">
+          Select District
+          <select
+            name="district"
+            value={formData.district}
+            onChange={handleChange}
+            className="block w-full border rounded mt-1 p-2"
+            required
+          >
+            <option value="">Choose your district</option>
+            <option value="Ampara">Ampara</option>
+            <option value="Anuradhapura">Anuradhapura</option>
+            <option value="Badulla">Badulla</option>
+            <option value="Batticaloa">Batticaloa</option>
+            <option value="Colombo">Colombo</option>
+            <option value="Galle">Galle</option>
+            <option value="Gampaha">Gampaha</option>
+            <option value="Hambantota">Hambantota</option>
+            <option value="Jaffna">Jaffna</option>
+            <option value="Kalutara">Kalutara</option>
+            <option value="Kandy">Kandy</option>
+            <option value="Kegalle">Kegalle</option>
+            <option value="Kilinochchi">Kilinochchi</option>
+            <option value="Kurunegala">Kurunegala</option>
+            <option value="Mannar">Mannar</option>
+            <option value="Matale">Matale</option>
+            <option value="Matara">Matara</option>
+            <option value="Monaragala">Monaragala</option>
+            <option value="Mullaitivu">Mullaitivu</option>
+            <option value="Nuwara Eliya">Nuwara Eliya</option>
+            <option value="Polonnaruwa">Polonnaruwa</option>
+            <option value="Puttalam">Puttalam</option>
+            <option value="Ratnapura">Ratnapura</option>
+            <option value="Trincomalee">Trincomalee</option>
+            <option value="Vavuniya">Vavuniya</option>
           </select>
         </label>
 
@@ -202,18 +286,15 @@ const DonorEligibility = () => {
         <button
           type="submit"
           disabled={!isFormValid()}
-          className={`w-full py-2 rounded text-white font-semibold transition 
-      ${
-        isFormValid()
-          ? "bg-red-600 hover:bg-red-700"
-          : "bg-gray-400 cursor-not-allowed"
-      }`}
+          className={`w-full py-2 rounded text-white font-semibold transition ${
+            isFormValid()
+              ? "bg-red-600 hover:bg-red-700"
+              : "bg-gray-400 cursor-not-allowed"
+          }`}
         >
           Confirm Eligibility
         </button>
       </form>
-
-      <section className="p-6 max-w-4x5 max-h-6 mx-auto"></section>
 
       <Footer />
     </div>
