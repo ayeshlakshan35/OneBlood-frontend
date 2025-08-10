@@ -48,7 +48,8 @@ export default function Navbar() {
 
 
   return (
-    <nav className="bg-white shadow-md w-full sticky top-0 z-10 ">
+    <nav className="bg-white shadow-md w-full fixed top-0 z-50">
+
       <div className="flex flex-wrap items-center justify-between w-full px-4 py-3">
 
       {/* Clickable Logo */}
@@ -103,12 +104,6 @@ export default function Navbar() {
           {isOpen ? <MdClose className="text-2xl" /> : <MdMenu className="text-2xl" />}
         </div>
       </div>
-
-
-
-
-
- 
       {/* Mobile Navigation Links */}
     {isOpen && (
     <div className="md:hidden bg-red-50 rounded-b-xl px-4 py-2 space-y-2 iteam-center shadow-md">

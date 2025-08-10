@@ -1,144 +1,263 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axiosInstance from "../../axiosInstance";
 import { useNavigate } from "react-router-dom";
 
+// Creative Toast Notification Component
+const SuccessToast = ({ show, message, onClose }) => {
+  useEffect(() => {
+    if (show) {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 3000); // Auto hide after 3 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [show, onClose]);
+
+  if (!show) return null;
+
+  return (
+    <div className="fixed top-6 right-6 z-50 transform transition-all duration-500 ease-out animate-slideIn">
+      <div className="bg-gradient-to-r from-green-400 to-emerald-500 text-white p-4 rounded-xl shadow-2xl border border-green-300 max-w-sm">
+        <div className="flex items-center space-x-3">
+          {/* Success Icon with animation */}
+          <div className="flex-shrink-0">
+            <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center animate-pulse">
+              <svg 
+                className="w-5 h-5 text-white" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M5 13l4 4L19 7" 
+                />
+              </svg>
+            </div>
+          </div>
+          
+          {/* Message */}
+          <div className="flex-1">
+            <p className="font-semibold text-sm">Success!</p>
+            <p className="text-xs text-green-100">{message}</p>
+          </div>
+          
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="flex-shrink-0 text-white hover:text-green-200 transition-colors duration-200"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        {/* Progress bar */}
+        <div className="mt-3 w-full bg-white bg-opacity-20 rounded-full h-1">
+          <div className="bg-white h-1 rounded-full animate-shrink"></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Enhanced Login Component
 export default function Log({ goto }) {
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const [userType, setUserType] = useState("user"); // "user" or "hospital"
+  const [userType, setUserType] = useState("user");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.name === "email" ? e.target.value.toLowerCase().trim() : e.target.value.trim(),
+      [e.target.name]: e.target.name === "email" 
+        ? e.target.value.toLowerCase().trim() 
+        : e.target.value.trim(),
     });
+  };
+
+  const showSuccessToast = (message) => {
+    setToastMessage(message);
+    setShowToast(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
+    setIsSubmitting(true);
 
     if (!formData.email || !formData.password) {
       setError("Email and password are required.");
+      setIsSubmitting(false);
       return;
     }
 
     try {
-      const loginUrl =
-        userType === "hospital"
-          ? "http://localhost:5000/api/routeshospital/login"
-          : "http://localhost:5000/api/auth/login";
+      const loginUrl = userType === "hospital"
+        ? "/routeshospital/login"
+        : "/auth/login";
 
-      console.log("Sending login request:", { url: loginUrl, data: formData });
+      const res = await axiosInstance.post(loginUrl, formData);
 
-      const res = await axiosInstance.post(loginUrl.replace("http://localhost:5000/api", ""), formData);
-
-      setSuccess("Login successful!");
-      console.log("Login response:", res.data);
-      console.log("🔍 Debug - Login response keys:", Object.keys(res.data));
-      console.log("🔍 Debug - Token in response:", res.data.token ? "Yes" : "No");
-
-      // Store the token in localStorage
+      // Show creative success toast
+      showSuccessToast(`Welcome back! Redirecting to ${userType === "hospital" ? "hospital" : "donor"} dashboard...`);
+      
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("userType", userType);
-        console.log("🔍 Debug - Token stored:", res.data.token.substring(0, 20) + "...");
+        
         if (res.data.user) {
           localStorage.setItem("user", JSON.stringify(res.data.user));
         }
         if (res.data.hospital) {
           localStorage.setItem("hospital", JSON.stringify(res.data.hospital));
         }
-        
-        // Verify token is stored before navigation
-        const storedToken = localStorage.getItem("token");
-        console.log("🔍 Debug - Token verification:", storedToken ? "Stored successfully" : "Failed to store");
 
-      setTimeout(() => {
-          console.log("🔍 Debug - Navigating after login, userType:", userType);
-        if (userType === "hospital") {
-            console.log("🔍 Debug - Navigating to /BloodB");
-          navigate("/BloodB");
-        } else {
-            console.log("🔍 Debug - Navigating to /home");
-          navigate("/home");
-        }
-        }, 1500); // Increased delay to ensure token is stored
-      } else {
-        console.log("🔍 Debug - No token in response!");
+        setTimeout(() => {
+          navigate(userType === "hospital" ? "/BloodB" : "/home");
+        }, 2000); // Slightly longer delay to see the toast
       }
     } catch (err) {
-      console.error("Login error:", err.response?.data, err);
       setError(err.response?.data?.message || "Login failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div>
-      <form
-        onSubmit={handleSubmit}
-        className="bg-gray-200 w-full max-w-md md:max-w-2xl px-6 sm:px-10 py-10 rounded-lg shadow-md space-y-4"
-      >
-        <h1 className="text-2xl font-bold text-center">Sign In</h1>
-        <h3 className="text-center text-gray-500">
+    <>
+      {/* Toast Notification */}
+      <SuccessToast 
+        show={showToast} 
+        message={toastMessage}
+        onClose={() => setShowToast(false)}
+      />
+
+      {/* Add custom CSS for animations */}
+      <style jsx>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%) translateY(-20px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0) translateY(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes shrink {
+          from {
+            width: 100%;
+          }
+          to {
+            width: 0%;
+          }
+        }
+
+        .animate-slideIn {
+          animation: slideIn 0.5s ease-out;
+        }
+
+        .animate-shrink {
+          animation: shrink 3s linear;
+        }
+      `}</style>
+
+      <div className="w-full">
+        <p className="text-gray-500 text-center mb-6">
           Use your email and password to sign in
-        </h3>
-
-        <div>
-          <label className="block mb-1 font-medium">Login as:</label>
-          <select
-            value={userType}
-            onChange={(e) => setUserType(e.target.value)}
-            className="w-full p-2 border rounded mb-4"
-          >
-            <option value="user">User</option>
-            <option value="hospital">Hospital</option>
-          </select>
-        </div>
-
-        <input
-          className="w-full p-3 border rounded"
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Enter Your Email"
-          required
-        />
-
-        <input
-          className="w-full p-3 border rounded"
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          placeholder="Enter Your Password"
-          required
-        />
-
-        <button
-          type="submit"
-          className="w-full py-2 rounded bg-red-800 text-white transition"
-        >
-          LOGIN
-        </button>
-
-        {error && <p className="text-red-500 text-center text-sm">{error}</p>}
-        {success && <p className="text-green-600 text-center text-sm">{success}</p>}
-
-        <p className="text-center text-sm sm:text-base">
-          Don't have an account?{" "}
-          <span
-            className="text-blue-500 cursor-pointer hover:underline"
-            onClick={goto}
-          >
-            Sign Up
-          </span>
         </p>
-      </form>
-    </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* User Type Selector */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Login as <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={userType}
+              onChange={(e) => setUserType(e.target.value)}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 transition duration-200"
+            >
+              <option value="user">Donor</option>
+              <option value="hospital">Hospital</option>
+            </select>
+          </div>
+
+          {/* Email Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email Address <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="your.email@example.com"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 transition duration-200"
+              required
+            />
+          </div>
+
+          {/* Password Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 transition duration-200"
+              required
+            />
+          </div>
+
+          {/* Error message only */}
+          {error && (
+            <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`w-full py-3 px-4 rounded-lg font-medium text-white transition duration-200 ${
+              isSubmitting
+                ? 'bg-red-400 cursor-not-allowed'
+                : 'bg-red-600 hover:bg-red-700'
+            }`}
+          >
+            {isSubmitting ? 'Signing In...' : 'Sign In'}
+          </button>
+
+          {/* Sign Up Link */}
+          <p className="text-center text-sm text-gray-600">
+            Don't have an account?{" "}
+            <button
+              type="button"
+              onClick={goto}
+              className="text-red-600 hover:text-red-800 font-medium hover:underline focus:outline-none"
+            >
+              Sign Up
+            </button>
+          </p>
+        </form>
+      </div>
+    </>
   );
 }
