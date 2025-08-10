@@ -1,29 +1,49 @@
 import Navbar from "../Component/Navbar/Navbar";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Footer from "../Component/Footer/Footer";
 import er from "../assets/er.png";
 import axiosInstance from '../axiosInstance';
+import DonorStatusCheck from "../Component/DonorStatus/DonorStatusCheck";
 
 const DonorEligibility = () => {
+  const [hospitals, setHospitals] = useState([]);
   const [formData, setFormData] = useState({
     bloodType: "",
-    district: "",
+    hospital: "",
     ageCriteria: false,
     donationGap: false,
     hemoglobin: false,
     healthCondition: false,
     identityProof: null,
+    donorName: "",
+    donorPhone: "",
+    donorEmail: "",
   });
+
+  // Fetch hospitals on component mount
+  useEffect(() => {
+    const fetchHospitals = async () => {
+      try {
+        const response = await axiosInstance.get("/routeshospital/all-hospitals");
+        setHospitals(response.data);
+      } catch (error) {
+        console.error("Error fetching hospitals:", error);
+      }
+    };
+    fetchHospitals();
+  }, []);
 
   const isFormValid = () => {
     return (
       formData.bloodType &&
-      formData.district &&
+      formData.hospital &&
       formData.ageCriteria &&
       formData.donationGap &&
       formData.hemoglobin &&
       formData.healthCondition &&
-      formData.identityProof
+      formData.identityProof &&
+      formData.donorName &&
+      formData.donorPhone
     );
   };
 
@@ -47,12 +67,15 @@ const DonorEligibility = () => {
     try {
       const data = new FormData();
       data.append("bloodType", formData.bloodType);
-      data.append("district", formData.district);
+      data.append("hospital", formData.hospital);
       data.append("ageCriteria", formData.ageCriteria);
       data.append("donationGap", formData.donationGap);
       data.append("hemoglobin", formData.hemoglobin);
       data.append("healthCondition", formData.healthCondition);
       data.append("identityProof", formData.identityProof);
+      data.append("donorName", formData.donorName);
+      data.append("donorPhone", formData.donorPhone);
+      data.append("donorEmail", formData.donorEmail);
 
       const response = await axiosInstance.post("/donors/add-donor", data, {
         headers: {
@@ -62,14 +85,20 @@ const DonorEligibility = () => {
 
       alert(response.data.message || "Donor eligibility submitted successfully!");
 
+      // Save donor phone to localStorage for automatic notifications
+      localStorage.setItem("donorPhone", formData.donorPhone);
+
       setFormData({
         bloodType: "",
-        district: "",
+        hospital: "",
         ageCriteria: false,
         donationGap: false,
         hemoglobin: false,
         healthCondition: false,
         identityProof: null,
+        donorName: "",
+        donorPhone: "",
+        donorEmail: "",
       });
     } catch (error) {
       console.error(error);
@@ -175,43 +204,64 @@ const DonorEligibility = () => {
           </select>
         </label>
 
-        {/* District */}
+        {/* Hospital */}
         <label className="block mb-3">
-          Select District
+          Select Hospital
           <select
-            name="district"
-            value={formData.district}
+            name="hospital"
+            value={formData.hospital}
             onChange={handleChange}
             className="block w-full border rounded mt-1 p-2"
             required
           >
-            <option value="">Choose your district</option>
-            <option value="Ampara">Ampara</option>
-            <option value="Anuradhapura">Anuradhapura</option>
-            <option value="Badulla">Badulla</option>
-            <option value="Batticaloa">Batticaloa</option>
-            <option value="Colombo">Colombo</option>
-            <option value="Galle">Galle</option>
-            <option value="Gampaha">Gampaha</option>
-            <option value="Hambantota">Hambantota</option>
-            <option value="Jaffna">Jaffna</option>
-            <option value="Kalutara">Kalutara</option>
-            <option value="Kandy">Kandy</option>
-            <option value="Kegalle">Kegalle</option>
-            <option value="Kilinochchi">Kilinochchi</option>
-            <option value="Kurunegala">Kurunegala</option>
-            <option value="Mannar">Mannar</option>
-            <option value="Matale">Matale</option>
-            <option value="Matara">Matara</option>
-            <option value="Monaragala">Monaragala</option>
-            <option value="Mullaitivu">Mullaitivu</option>
-            <option value="Nuwara Eliya">Nuwara Eliya</option>
-            <option value="Polonnaruwa">Polonnaruwa</option>
-            <option value="Puttalam">Puttalam</option>
-            <option value="Ratnapura">Ratnapura</option>
-            <option value="Trincomalee">Trincomalee</option>
-            <option value="Vavuniya">Vavuniya</option>
+            <option value="">Choose your hospital</option>
+            {hospitals.map((hospital) => (
+              <option key={hospital._id} value={hospital._id}>
+                {hospital.hospitalName} - {hospital.district}
+              </option>
+            ))}
           </select>
+        </label>
+
+        {/* Contact Information */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <label className="block">
+            Full Name
+            <input
+              type="text"
+              name="donorName"
+              value={formData.donorName}
+              onChange={handleChange}
+              className="block w-full border rounded mt-1 p-2"
+              placeholder="Enter your full name"
+              required
+            />
+          </label>
+
+          <label className="block">
+            Phone Number
+            <input
+              type="tel"
+              name="donorPhone"
+              value={formData.donorPhone}
+              onChange={handleChange}
+              className="block w-full border rounded mt-1 p-2"
+              placeholder="Enter your phone number"
+              required
+            />
+          </label>
+        </div>
+
+        <label className="block mb-4">
+          Email Address (Optional)
+          <input
+            type="email"
+            name="donorEmail"
+            value={formData.donorEmail}
+            onChange={handleChange}
+            className="block w-full border rounded mt-1 p-2"
+            placeholder="Enter your email address"
+          />
         </label>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -295,6 +345,11 @@ const DonorEligibility = () => {
           Confirm Eligibility
         </button>
       </form>
+
+      {/* Status Check Section */}
+      <section className="max-w-4xl mx-auto mb-12">
+        <DonorStatusCheck />
+      </section>
 
       <Footer />
     </div>

@@ -3,6 +3,7 @@ import AddBlood from "../Component/Bloodbank/AddBlood";
 import BloodHistory from "../Component/Bloodbank/BloodHistory";
 import AddCamp from "../Component/Bloodbank/AddCamp";
 import BloodSummary from "../Component/Bloodbank/BloodSummary";
+import DonorRequests from "../Component/Bloodbank/DonorRequests";
 import axiosInstance from "../axiosInstance"; // centralized axios instance
 
 export default function BloodBank() {
@@ -155,6 +156,17 @@ export default function BloodBank() {
           </button>
 
           <button
+            onClick={() => setActiveTab("requests")}
+            className={`px-5 py-2 rounded font-semibold shadow ${
+              activeTab === "requests"
+                ? "bg-white text-red-600"
+                : "bg-red-700 text-white"
+            }`}
+          >
+            Donor Requests
+          </button>
+
+          <button
             onClick={() => setActiveTab("camp")}
             className={`px-5 py-2 rounded font-semibold shadow ${
               activeTab === "camp"
@@ -245,6 +257,11 @@ export default function BloodBank() {
               )}
             </div>
           </>
+        )}
+        {activeTab === "requests" && (
+          <div className="lg:col-span-2">
+            <DonorRequests />
+          </div>
         )}
         {activeTab === "camp" && (
           <div className="lg:col-span-2">
