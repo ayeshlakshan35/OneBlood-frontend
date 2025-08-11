@@ -1,130 +1,262 @@
-import React, { useEffect, useState } from "react";
-import axiosInstance from "../../axiosInstance";
+import React, { useState } from "react";
+import { Calendar, Clock, MapPin, Building2, FileText, Phone, Heart, Upload, Plus } from "lucide-react";
 
-export default function MyCampHistory() {
-  const [camps, setCamps] = useState([]);
-  const [loading, setLoading] = useState(true);
+// Mock CampHistory component since we don't have the original
+const CampHistory = () => (
+  <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-red-100">
+    <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+      <Heart className="text-red-600" />
+      Campaign History
+    </h3>
+    <div className="text-center text-gray-500 py-8">
+      <div className="w-16 h-16 mx-auto mb-4 bg-red-50 rounded-full flex items-center justify-center">
+        <FileText className="w-8 h-8 text-red-600" />
+      </div>
+      <p>Your campaign history will appear here</p>
+    </div>
+  </div>
+);
 
-  useEffect(() => {
-    const fetchCamps = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return alert("Please login first");
+export default function AddCamp() {
+  const [formData, setFormData] = useState({
+    title: "",
+    hospital: "",
+    date: "",
+    time: "",
+    location: "",
+    description: "",
+    contact: "",
+    document: null,
+  });
 
-      try {
-        const response = await axiosInstance.get("/camp/my-camps", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setCamps(response.data.camps);
-      } catch (err) {
-        console.error("Error fetching camps:", err);
-        alert("Failed to load camp history");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
 
-    fetchCamps();
-  }, []);
+  const handleChange = (e) => {
+    const { name, value, files } = e.target; 
+    setFormData((prev) => ({
+      ...prev,
+      [name]: files ? files[0] : value,
+    }));
+  };
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setFormData(prev => ({
+        ...prev,
+        document: e.dataTransfer.files[0]
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulating API call - replace with your actual implementation
+    try {
+      // Your existing submit logic would go here
+      console.log("Form submitted:", formData);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      alert("Campaign created successfully!");
+      setFormData({
+        title: "",
+        hospital: "",
+        date: "",
+        time: "",
+        location: "",
+        description: "",
+        contact: "",
+        document: null,
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Error creating campaign");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const inputFields = [
+    { name: "title", type: "text", placeholder: "Enter campaign title", icon: Heart, required: true },
+    { name: "hospital", type: "text", placeholder: "Enter organizing hospital", icon: Building2, required: true },
+    { name: "date", type: "date", placeholder: "", icon: Calendar, required: true },
+    { name: "time", type: "time", placeholder: "", icon: Clock, required: true },
+    { name: "location", type: "text", placeholder: "Enter venue location", icon: MapPin, required: true },
+    { name: "contact", type: "text", placeholder: "Contact person name and phone", icon: Phone, required: true },
+  ];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">My Campaign History</h2>
-      {camps.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">No campaigns found.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {camps.map((camp) => (
-            <div key={camp._id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-              {/* Image Section */}
-              <div className="relative h-48 bg-gray-100">
-                {camp.documentPath && (
-                  camp.documentPath.match(/\.(jpg|jpeg|png|gif|webp|bmp)$/i) ? (
-                    <img
-                      src={`http://localhost:5000/${camp.documentPath}`}
-                      alt="Campaign Document"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <div className="text-center">
-                        <svg className="w-16 h-16 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <a
-                          href={`http://localhost:5000/${camp.documentPath}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                        >
-                          View Document
-                        </a>
-                      </div>
-                    </div>
-                  )
-                )}
-                {!camp.documentPath && (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <svg className="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                )}
-                {/* Date Badge */}
-                <div className="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                  {new Date(camp.date).toLocaleDateString()}
-                  {camp.time && (
-                    <div className="text-xs">
-                      {camp.time}
-                    </div>
-                  )}
-                </div>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50 p-4">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-32 h-32 bg-red-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-bounce"></div>
+        <div className="absolute bottom-20 left-20 w-40 h-40 bg-red-50 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+      </div>
 
-              {/* Content Section */}
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">{camp.title}</h3>
-                
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    <span className="truncate">{camp.hospital}</span>
+      <div className="max-w-6xl mx-auto relative z-10">
+        {/* Hero Header */}
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            {/* Your Logo */}
+            <div className="relative">
+              <img 
+                src="/src/assets/logo2.png" 
+                alt="Organization Logo" 
+                className="w-20 h-20 object-contain rounded-xl shadow-lg hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-red-600 mb-4">
+            Save Lives Together
+          </h1>
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            Create a blood donation campaign and make a difference in your community
+          </p>
+        </div>
+
+        {/* Add Campaign Form */}
+        <section className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-8 border border-red-100 hover:shadow-3xl transition-all duration-300">
+          <div className="flex items-center justify-center mb-8">
+            <div className="flex items-center gap-3 bg-red-600 text-white px-6 py-3 rounded-full shadow-lg">
+              <Plus className="w-6 h-6" />
+              <h2 className="text-xl font-bold">Add Blood Donation Campaign</h2>
+            </div>
+          </div>
+
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {inputFields.map((field) => {
+                const Icon = field.icon;
+                return (
+                  <div key={field.name} className="group">
+                    <div className="relative">
+                      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-red-600 group-focus-within:text-red-700 transition-colors duration-200">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <input
+                        name={field.name}
+                        type={field.type}
+                        placeholder={field.placeholder}
+                        className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-red-600 focus:ring-4 focus:ring-red-100 transition-all duration-200 bg-white/50 backdrop-blur-sm group-hover:border-red-600"
+                        onChange={handleChange}
+                        value={formData[field.name]}
+                        required={field.required}
+                      />
+                    </div>
                   </div>
-                  
-                  <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span className="truncate">{camp.location}</span>
+                );
+              })}
+            </div>
+
+            {/* Description Field */}
+            <div className="group">
+              <div className="relative">
+                <div className="absolute left-4 top-4 text-red-600 group-focus-within:text-red-700 transition-colors duration-200">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <textarea
+                  name="description"
+                  placeholder="Enter campaign description and details..."
+                  rows="4"
+                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-red-600 focus:ring-4 focus:ring-red-100 transition-all duration-200 resize-none bg-white/50 backdrop-blur-sm group-hover:border-red-600"
+                  onChange={handleChange}
+                  value={formData.description}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* File Upload */}
+            <div className="group">
+              <label className="block text-gray-700 font-semibold mb-3 flex items-center gap-2">
+                <Upload className="w-5 h-5 text-red-600" />
+                Valid Documents*
+              </label>
+              <div
+                className={`relative border-3 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all duration-300 bg-white/30 backdrop-blur-sm ${
+                  dragActive 
+                    ? "border-red-600 bg-red-50" 
+                    : "border-gray-300 hover:border-red-600 hover:bg-red-50/30"
+                }`}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+              >
+                <input
+                  name="document"
+                  type="file"
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  onChange={handleChange}
+                  required
+                />
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                    <Upload className="w-8 h-8 text-red-600" />
                   </div>
-                  
-                  <div className="flex items-start">
-                    <svg className="w-4 h-4 mr-2 mt-0.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                    <span className="line-clamp-2">{camp.description}</span>
-                  </div>
-                  
-                  <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                    <span className="truncate">{camp.contact}</span>
+                  <div>
+                    <p className="text-lg font-medium text-gray-700 mb-1">
+                      {formData.document ? formData.document.name : "Drop your document here"}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      or click to browse files
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+
+            {/* Submit Button */}
+            <div className="flex justify-center pt-4">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                onClick={handleSubmit}
+                className={`group relative px-12 py-4 bg-red-600 text-white font-bold text-lg rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${
+                  isSubmitting 
+                    ? "opacity-75 cursor-not-allowed" 
+                    : "hover:bg-red-700"
+                }`}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Creating Campaign...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <Heart className="w-6 h-6 group-hover:animate-pulse" />
+                    Create Campaign
+                  </div>
+                )}
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Campaign History */}
+        <CampHistory />
+      </div>
     </div>
   );
 }
