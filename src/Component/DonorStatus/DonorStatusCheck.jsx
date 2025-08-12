@@ -162,8 +162,17 @@ const DonorStatusCheck = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              <h3 className="font-semibold text-lg mb-3">Your Requests:</h3>
-              {requests.map((request) => (
+              <h3 className="font-semibold text-lg mb-3">Rejected Requests:</h3>
+              {(() => {
+                const filteredRequests = requests.filter(r => r.status === "rejected" || (r.hospitalResponse && r.hospitalResponse.accepted === false));
+                if (filteredRequests.length === 0) {
+                  return (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">No rejected requests found.</p>
+                    </div>
+                  );
+                }
+                return filteredRequests.map((request) => (
                 <div key={request._id} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div>
@@ -187,54 +196,54 @@ const DonorStatusCheck = () => {
                     </div>
                   </div>
 
-                  {request.hospitalResponse && request.hospitalResponse.accepted && (
-                    <div className="border-t pt-3 bg-green-50 p-3 rounded">
-                      <h5 className="font-semibold text-green-800 mb-2">🎉 Your request has been accepted!</h5>
-                      <p className="text-sm text-green-700 mb-2">
-                        <strong>Appointment Date:</strong> {new Date(request.hospitalResponse.scheduledDate).toLocaleDateString()}
-                      </p>
-                      <p className="text-sm text-green-700 mb-2">
-                        <strong>Appointment Time:</strong> {request.hospitalResponse.scheduledTime}
-                      </p>
-                      {request.hospitalResponse.message && (
-                        <p className="text-sm text-green-700">
-                          <strong>Message from hospital:</strong> {request.hospitalResponse.message}
-                        </p>
-                      )}
-                      <div className="mt-3 p-2 bg-green-100 rounded">
-                        <p className="text-sm text-green-800 font-semibold">
-                          📞 Please contact the hospital if you need to reschedule or have any questions.
+                                     {request.hospitalResponse && request.hospitalResponse.accepted && (
+                     <div className="border-t pt-3 bg-green-50 p-3 rounded">
+                       <h5 className="font-semibold text-green-800 mb-2">🎉 Your request has been accepted!</h5>
+                       <p className="text-sm text-green-700 mb-2">
+                         <strong>Appointment Date:</strong> {new Date(request.hospitalResponse.scheduledDate).toLocaleDateString()}
+                       </p>
+                       <p className="text-sm text-green-700 mb-2">
+                         <strong>Appointment Time:</strong> {request.hospitalResponse.scheduledTime}
+                       </p>
+                       {request.hospitalResponse.message && (
+                         <p className="text-sm text-green-700">
+                           <strong>Message from hospital:</strong> {request.hospitalResponse.message}
+                         </p>
+                       )}
+                       <div className="mt-3 p-2 bg-green-100 rounded">
+                         <p className="text-sm text-green-800 font-semibold">
+                           📞 Please contact the hospital if you need to reschedule or have any questions.
+                         </p>
+                       </div>
+                     </div>
+                   )}
+
+                                       {request.status === "rejected" && (
+                      <div className="border-t pt-3 bg-red-50 p-3 rounded">
+                        <h5 className="font-semibold text-red-800 mb-2">❌ Your request was rejected</h5>
+                        {request.hospitalResponse?.message && (
+                          <p className="text-sm text-red-700 mb-2">
+                            <strong>Reason for rejection:</strong> {request.hospitalResponse.message}
+                          </p>
+                        )}
+                        <div className="mt-3 p-2 bg-red-100 rounded">
+                          <p className="text-sm text-red-800 font-semibold">
+                            💡 You can submit a new request to another hospital or try again later.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {request.status === "pending" && (
+                      <div className="border-t pt-3 bg-yellow-50 p-3 rounded">
+                        <h5 className="font-semibold text-yellow-800 mb-2">⏳ Your request is under review</h5>
+                        <p className="text-sm text-yellow-700">
+                          The hospital is reviewing your eligibility. You will receive a notification once they respond.
                         </p>
                       </div>
-                    </div>
-                  )}
-
-                  {request.hospitalResponse && !request.hospitalResponse.accepted && (
-                    <div className="border-t pt-3 bg-red-50 p-3 rounded">
-                      <h5 className="font-semibold text-red-800 mb-2">❌ Your request was not accepted</h5>
-                      {request.hospitalResponse.message && (
-                        <p className="text-sm text-red-700">
-                          <strong>Reason:</strong> {request.hospitalResponse.message}
-                        </p>
-                      )}
-                      <div className="mt-3 p-2 bg-red-100 rounded">
-                        <p className="text-sm text-red-800 font-semibold">
-                          💡 You can submit a new request to another hospital or try again later.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {request.status === "pending" && (
-                    <div className="border-t pt-3 bg-yellow-50 p-3 rounded">
-                      <h5 className="font-semibold text-yellow-800 mb-2">⏳ Your request is under review</h5>
-                      <p className="text-sm text-yellow-700">
-                        The hospital is reviewing your eligibility. You will receive a notification once they respond.
-                      </p>
-                    </div>
-                  )}
+                    )}
                 </div>
-              ))}
+              ));})()}
             </div>
           )}
         </div>
