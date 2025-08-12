@@ -1,21 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar, Clock, MapPin, Building2, FileText, Phone, Heart, Upload, Plus } from "lucide-react";
-
-// Mock CampHistory component since we don't have the original
-const CampHistory = () => (
-  <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-red-100">
-    <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-      <Heart className="text-red-600" />
-      Campaign History
-    </h3>
-    <div className="text-center text-gray-500 py-8">
-      <div className="w-16 h-16 mx-auto mb-4 bg-red-50 rounded-full flex items-center justify-center">
-        <FileText className="w-8 h-8 text-red-600" />
-      </div>
-      <p>Your campaign history will appear here</p>
-    </div>
-  </div>
-);
+import axiosInstance from "../../axiosInstance";
+import CampHistory from "./CampHistory";
 
 export default function AddCamp() {
   const [formData, setFormData] = useState({
@@ -31,6 +17,7 @@ export default function AddCamp() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [refreshHistory, setRefreshHistory] = useState(0);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target; 
@@ -67,15 +54,40 @@ export default function AddCamp() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulating API call - replace with your actual implementation
     try {
-      // Your existing submit logic would go here
-      console.log("Form submitted:", formData);
+      console.log("🔍 Debug - Form data to submit:", formData);
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create FormData for file upload
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('hospital', formData.hospital);
+      formDataToSend.append('date', formData.date);
+      formDataToSend.append('time', formData.time);
+      formDataToSend.append('location', formData.location);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('contact', formData.contact);
       
-      alert("Campaign created successfully!");
+      if (formData.document) {
+        formDataToSend.append('document', formData.document);
+        console.log("🔍 Debug - Document attached:", formData.document.name);
+      }
+
+      console.log("🔍 Debug - Making API call to /camp/add");
+      
+      // Make API call to save camp
+      const response = await axiosInstance.post('/camp/add', formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      console.log("🔍 Debug - API response:", response.data);
+      
+      // Show success message
+      const successMessage = `✅ Campaign "${formData.title}" created successfully! It will appear in your campaign history below.`;
+      alert(successMessage);
+      
+      // Reset form
       setFormData({
         title: "",
         hospital: "",
@@ -86,9 +98,13 @@ export default function AddCamp() {
         contact: "",
         document: null,
       });
+      
+      // Trigger refresh of camp history
+      setRefreshHistory(prev => prev + 1);
     } catch (err) {
-      console.error(err);
-      alert("Error creating campaign");
+      console.error("❌ Error creating campaign:", err);
+      console.error("❌ Error response:", err.response?.data);
+      alert(err.response?.data?.error || "Error creating campaign");
     } finally {
       setIsSubmitting(false);
     }
@@ -254,7 +270,7 @@ export default function AddCamp() {
         </section>
 
         {/* Campaign History */}
-        <CampHistory />
+        <CampHistory key={refreshHistory} />
       </div>
     </div>
   );

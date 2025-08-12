@@ -8,7 +8,7 @@ import FindBlood from "./Pages/FindBlood";
 import DonateBlood from "./Pages/DonateBlood";
 import BloodBank from "./Pages/BloodBank";
 import Camp from "./Pages/Camp";
-import Navbar from "./Component/Navbar/Navbar";
+
 import "./App.css";
 import Login from "./Pages/Login";
 import { ToastContainer } from "react-toastify"; // ✅ Import Toastify container
@@ -18,8 +18,7 @@ function App() {
   return (
     <>
       <Router>
-        {/* ✅ Keep Navbar visible across pages */}
-        <Navbar />
+    
 
         <Routes>
           <Route path="/" element={<LandingPage />} />

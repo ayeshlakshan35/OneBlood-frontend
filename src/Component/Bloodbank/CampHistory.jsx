@@ -1,262 +1,183 @@
-import React, { useState } from "react";
-import { Calendar, Clock, MapPin, Building2, FileText, Phone, Heart, Upload, Plus } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Calendar, Clock, MapPin, Building2, FileText, Phone, Heart, Trash2, Edit } from "lucide-react";
+import axiosInstance from "../../axiosInstance";
 
-// Mock CampHistory component since we don't have the original
-const CampHistory = () => (
-  <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-red-100">
-    <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-      <Heart className="text-red-600" />
-      Campaign History
-    </h3>
-    <div className="text-center text-gray-500 py-8">
-      <div className="w-16 h-16 mx-auto mb-4 bg-red-50 rounded-full flex items-center justify-center">
-        <FileText className="w-8 h-8 text-red-600" />
-      </div>
-      <p>Your campaign history will appear here</p>
-    </div>
-  </div>
-);
+export default function CampHistory() {
+  const [camps, setCamps] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-export default function AddCamp() {
-  const [formData, setFormData] = useState({
-    title: "",
-    hospital: "",
-    date: "",
-    time: "",
-    location: "",
-    description: "",
-    contact: "",
-    document: null,
-  });
+  useEffect(() => {
+    fetchCamps();
+  }, []); // This will re-run whenever the component is re-mounted (when key changes)
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [dragActive, setDragActive] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value, files } = e.target; 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: files ? files[0] : value,
-    }));
-  };
-
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFormData(prev => ({
-        ...prev,
-        document: e.dataTransfer.files[0]
-      }));
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulating API call - replace with your actual implementation
+  const fetchCamps = async () => {
     try {
-      // Your existing submit logic would go here
-      console.log("Form submitted:", formData);
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      alert("Campaign created successfully!");
-      setFormData({
-        title: "",
-        hospital: "",
-        date: "",
-        time: "",
-        location: "",
-        description: "",
-        contact: "",
-        document: null,
-      });
+      setLoading(true);
+      setError(null);
+      console.log("🔍 Debug - Fetching camps from /camp/user-camps");
+      const response = await axiosInstance.get('/camp/user-camps');
+      console.log("🔍 Debug - Camps response:", response.data);
+      setCamps(response.data.camps);
     } catch (err) {
-      console.error(err);
-      alert("Error creating campaign");
+      console.error("❌ Error fetching camps:", err);
+      console.error("❌ Error response:", err.response?.data);
+      setError("Failed to fetch campaign history");
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
-  const inputFields = [
-    { name: "title", type: "text", placeholder: "Enter campaign title", icon: Heart, required: true },
-    { name: "hospital", type: "text", placeholder: "Enter organizing hospital", icon: Building2, required: true },
-    { name: "date", type: "date", placeholder: "", icon: Calendar, required: true },
-    { name: "time", type: "time", placeholder: "", icon: Clock, required: true },
-    { name: "location", type: "text", placeholder: "Enter venue location", icon: MapPin, required: true },
-    { name: "contact", type: "text", placeholder: "Contact person name and phone", icon: Phone, required: true },
-  ];
+  const handleDeleteCamp = async (campId) => {
+    if (!window.confirm("Are you sure you want to delete this campaign?")) {
+      return;
+    }
+
+    try {
+      await axiosInstance.delete(`/camp/${campId}`);
+      alert("Campaign deleted successfully!");
+      fetchCamps(); // Refresh the list
+    } catch (err) {
+      console.error("Error deleting camp:", err);
+      alert(err.response?.data?.error || "Error deleting campaign");
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-red-100">
+        <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+          <Heart className="text-red-600" />
+          Campaign History
+        </h3>
+        <div className="text-center text-gray-500 py-8">
+          <div className="w-16 h-16 mx-auto mb-4 bg-red-50 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <p>Loading campaign history...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-red-100">
+        <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+          <Heart className="text-red-600" />
+          Campaign History
+        </h3>
+        <div className="text-center text-red-500 py-8">
+          <div className="w-16 h-16 mx-auto mb-4 bg-red-50 rounded-full flex items-center justify-center">
+            <FileText className="w-8 h-8 text-red-600" />
+          </div>
+          <p>{error}</p>
+          <button 
+            onClick={fetchCamps}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50 p-4">
-      {/* Animated background elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-red-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-bounce"></div>
-        <div className="absolute bottom-20 left-20 w-40 h-40 bg-red-50 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-      </div>
-
-      <div className="max-w-6xl mx-auto relative z-10">
-        {/* Hero Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-4 mb-6">
-            {/* Your Logo */}
-            <div className="relative">
-              <img 
-                src="/src/assets/logo2.png" 
-                alt="Organization Logo" 
-                className="w-20 h-20 object-contain rounded-xl shadow-lg hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-            
+    <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-red-100">
+      <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+        <Heart className="text-red-600" />
+        Campaign History
+        {camps.length > 0 && (
+          <span className="text-sm font-normal text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+            {camps.length} campaign{camps.length !== 1 ? 's' : ''}
+          </span>
+        )}
+      </h3>
+      
+      {camps.length === 0 ? (
+        <div className="text-center text-gray-500 py-8">
+          <div className="w-16 h-16 mx-auto mb-4 bg-red-50 rounded-full flex items-center justify-center">
+            <FileText className="w-8 h-8 text-red-600" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-red-600 mb-4">
-            Save Lives Together
-          </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Create a blood donation campaign and make a difference in your community
-          </p>
+          <p>No campaigns found. Create your first campaign to see it here!</p>
         </div>
-
-        {/* Add Campaign Form */}
-        <section className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-8 border border-red-100 hover:shadow-3xl transition-all duration-300">
-          <div className="flex items-center justify-center mb-8">
-            <div className="flex items-center gap-3 bg-red-600 text-white px-6 py-3 rounded-full shadow-lg">
-              <Plus className="w-6 h-6" />
-              <h2 className="text-xl font-bold">Add Blood Donation Campaign</h2>
-            </div>
-          </div>
-
-          <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {inputFields.map((field) => {
-                const Icon = field.icon;
-                return (
-                  <div key={field.name} className="group">
-                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-red-600 group-focus-within:text-red-700 transition-colors duration-200">
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <input
-                        name={field.name}
-                        type={field.type}
-                        placeholder={field.placeholder}
-                        className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-red-600 focus:ring-4 focus:ring-red-100 transition-all duration-200 bg-white/50 backdrop-blur-sm group-hover:border-red-600"
-                        onChange={handleChange}
-                        value={formData[field.name]}
-                        required={field.required}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Description Field */}
-            <div className="group">
-              <div className="relative">
-                <div className="absolute left-4 top-4 text-red-600 group-focus-within:text-red-700 transition-colors duration-200">
-                  <FileText className="w-5 h-5" />
+      ) : (
+        <div className="space-y-6">
+          {camps.map((camp) => (
+            <div key={camp._id} className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex-1">
+                  <h4 className="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+                    <Heart className="w-5 h-5 text-red-600" />
+                    {camp.title}
+                  </h4>
+                  <p className="text-gray-600 mb-3">{camp.description}</p>
                 </div>
-                <textarea
-                  name="description"
-                  placeholder="Enter campaign description and details..."
-                  rows="4"
-                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-red-600 focus:ring-4 focus:ring-red-100 transition-all duration-200 resize-none bg-white/50 backdrop-blur-sm group-hover:border-red-600"
-                  onChange={handleChange}
-                  value={formData.description}
-                  required
-                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleDeleteCamp(camp._id)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Delete Campaign"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
-            </div>
-
-            {/* File Upload */}
-            <div className="group">
-              <label className="block text-gray-700 font-semibold mb-3 flex items-center gap-2">
-                <Upload className="w-5 h-5 text-red-600" />
-                Valid Documents*
-              </label>
-              <div
-                className={`relative border-3 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all duration-300 bg-white/30 backdrop-blur-sm ${
-                  dragActive 
-                    ? "border-red-600 bg-red-50" 
-                    : "border-gray-300 hover:border-red-600 hover:bg-red-50/30"
-                }`}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
-              >
-                <input
-                  name="document"
-                  type="file"
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  onChange={handleChange}
-                  required
-                />
-                <div className="flex flex-col items-center gap-4">
-                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                    <Upload className="w-8 h-8 text-red-600" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-medium text-gray-700 mb-1">
-                      {formData.document ? formData.document.name : "Drop your document here"}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      or click to browse files
-                    </p>
-                  </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Building2 className="w-4 h-4 text-red-600" />
+                  <span className="text-sm">{camp.hospital}</span>
+                </div>
+                
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Calendar className="w-4 h-4 text-red-600" />
+                  <span className="text-sm">{formatDate(camp.date)}</span>
+                </div>
+                
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Clock className="w-4 h-4 text-red-600" />
+                  <span className="text-sm">{camp.time}</span>
+                </div>
+                
+                <div className="flex items-center gap-2 text-gray-600">
+                  <MapPin className="w-4 h-4 text-red-600" />
+                  <span className="text-sm">{camp.location}</span>
+                </div>
+                
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Phone className="w-4 h-4 text-red-600" />
+                  <span className="text-sm">{camp.contact}</span>
+                </div>
+                
+                <div className="flex items-center gap-2 text-gray-600">
+                  <FileText className="w-4 h-4 text-red-600" />
+                  <span className="text-sm">
+                    {camp.documentPath ? "Document uploaded" : "No document"}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="flex justify-between items-center text-xs text-gray-500">
+                  <span>Created: {formatDate(camp.createdAt)}</span>
+                  <span>Campaign ID: {camp._id.slice(-8)}</span>
                 </div>
               </div>
             </div>
-
-            {/* Submit Button */}
-            <div className="flex justify-center pt-4">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                onClick={handleSubmit}
-                className={`group relative px-12 py-4 bg-red-600 text-white font-bold text-lg rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${
-                  isSubmitting 
-                    ? "opacity-75 cursor-not-allowed" 
-                    : "hover:bg-red-700"
-                }`}
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Creating Campaign...
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-3">
-                    <Heart className="w-6 h-6 group-hover:animate-pulse" />
-                    Create Campaign
-                  </div>
-                )}
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* Campaign History */}
-        <CampHistory />
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
