@@ -32,10 +32,14 @@ export default function Camp() {
       {/* Campaigns Section */}
       <div className="py-16 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-4">
-            Active Campaigns
-          </h2>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          <div className="inline-block">
+            <h2 className="text-4xl md:text-5xl font-bold text-red-600 mb-4 leading-tight pb-2 relative">
+              <span className="bg-gradient-to-r from-red-600 to-red-500 bg-clip-text text-transparent">
+                Active Campaigns
+              </span>
+            </h2>
+          </div>
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto leading-relaxed">
             Browse through our current blood donation campaigns and find one near you
           </p>
         </div>
@@ -119,7 +123,7 @@ export default function Camp() {
                   {/* Details Section */}
                   <div className="w-1/2 p-6 flex flex-col justify-between bg-gradient-to-br from-white to-gray-50/50">
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-800 mb-4 line-clamp-2 group-hover:text-red-600 transition-colors leading-tight">
+                      <h3 className="text-xl font-bold text-gray-800 mb-4 line-clamp-2 group-hover:text-red-600 transition-colors leading-tight min-h-[3rem]">
                         {camp.title}
                       </h3>
                       <div className="space-y-3 flex-1">
@@ -129,7 +133,7 @@ export default function Camp() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                             </svg>
                           </div>
-                          <span className="text-gray-700 font-medium text-sm truncate">{camp.hospital}</span>
+                          <span className="text-gray-700 font-medium text-sm leading-tight">{camp.hospital}</span>
                         </div>
                         
                         <div className="flex items-center group/item hover:bg-red-50 p-2 -mx-2 rounded-lg transition-colors">
@@ -139,7 +143,7 @@ export default function Camp() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                           </div>
-                          <span className="text-gray-700 font-medium text-sm truncate">{camp.location}</span>
+                          <span className="text-gray-700 font-medium text-sm leading-tight">{camp.location}</span>
                         </div>
                         
                         <div className="flex items-start group/item hover:bg-red-50 p-2 -mx-2 rounded-lg transition-colors">
@@ -148,7 +152,7 @@ export default function Camp() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                             </svg>
                           </div>
-                          <span className="text-gray-600 text-sm line-clamp-3 leading-relaxed">{camp.description}</span>
+                          <span className="text-gray-600 text-sm line-clamp-3 leading-relaxed min-h-[4.5rem]">{camp.description}</span>
                         </div>
                       </div>
                     </div>
@@ -161,7 +165,7 @@ export default function Camp() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                             </svg>
                           </div>
-                          <span className="text-sm font-medium truncate">{camp.contact}</span>
+                          <span className="text-sm font-medium leading-tight">{camp.contact}</span>
                         </div>
                        
                       </div>
@@ -206,6 +210,57 @@ export default function Camp() {
         
         .delay-1000 {
           animation-delay: 1000ms;
+        }
+        
+        /* Fix text rendering issues */
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        
+        .line-clamp-3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        
+        /* Ensure proper text rendering */
+        * {
+          text-rendering: optimizeLegibility;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Fix gradient text rendering issues */
+        .bg-clip-text {
+          -webkit-background-clip: text;
+          background-clip: text;
+          display: inline-block;
+          line-height: 1.2;
+          padding-bottom: 0.1em;
+          margin-bottom: -0.1em;
+        }
+        
+        /* Ensure proper line height for all text elements */
+        h1, h2, h3, h4, h5, h6 {
+          line-height: 1.2;
+          padding-bottom: 0.1em;
+        }
+        
+        /* Fix for letters with descenders */
+        .leading-tight {
+          line-height: 1.2;
+          padding-bottom: 0.1em;
+        }
+        
+        .leading-relaxed {
+          line-height: 1.6;
+          padding-bottom: 0.1em;
         }
       `}</style>
     </div>

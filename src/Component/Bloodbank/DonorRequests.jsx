@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../axiosInstance";
+import { useToast } from "../Toast/ToastContext";
 
-const DonorRequests = () => {
+const DonorRequests = ({ onRequestStatusChange }) => {
+  const { showSuccess, showError } = useToast();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRequest, setSelectedRequest] = useState(null);
@@ -41,7 +43,7 @@ const DonorRequests = () => {
         `/donors/respond-request/${requestId}`,
         responseData
       );
-      alert(response.data.message);
+      showSuccess(response.data.message);
       setSelectedRequest(null);
       setResponseForm({
         accepted: false,
@@ -51,9 +53,14 @@ const DonorRequests = () => {
         message: "",
       });
       fetchRequests();
+      
+      // Notify parent component that request status changed
+      if (onRequestStatusChange) {
+        onRequestStatusChange();
+      }
     } catch (error) {
       console.error("Error responding to request:", error);
-      alert("Error responding to request. Please try again.");
+      showError("Error responding to request. Please try again.");
     }
   };
 

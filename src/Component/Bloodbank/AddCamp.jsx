@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, Clock, MapPin, Building2, FileText, Phone, Heart, Upload, Plus } from "lucide-react";
 import axiosInstance from "../../axiosInstance";
+import { useToast } from "../Toast/ToastContext";
 import CampHistory from "./CampHistory";
 
-export default function AddCamp() {
+export default function AddCamp({ onCampCreated }) {
+  const { showSuccess, showError } = useToast();
   const [formData, setFormData] = useState({
     title: "",
     hospital: "",
@@ -84,8 +86,7 @@ export default function AddCamp() {
       console.log("🔍 Debug - API response:", response.data);
       
       // Show success message
-      const successMessage = `✅ Campaign "${formData.title}" created successfully! It will appear in your campaign history below.`;
-      alert(successMessage);
+      showSuccess(`Campaign "${formData.title}" created successfully! It will appear in your campaign history below.`);
       
       // Reset form
       setFormData({
@@ -101,10 +102,15 @@ export default function AddCamp() {
       
       // Trigger refresh of camp history
       setRefreshHistory(prev => prev + 1);
+      
+      // Notify parent component that camp was created
+      if (onCampCreated) {
+        onCampCreated();
+      }
     } catch (err) {
       console.error("❌ Error creating campaign:", err);
       console.error("❌ Error response:", err.response?.data);
-      alert(err.response?.data?.error || "Error creating campaign");
+      showError(err.response?.data?.error || "Error creating campaign");
     } finally {
       setIsSubmitting(false);
     }
@@ -203,7 +209,7 @@ export default function AddCamp() {
 
             {/* File Upload */}
             <div className="group">
-              <label className="block text-gray-700 font-semibold mb-3 flex items-center gap-2">
+              <label className=" text-gray-700 font-semibold mb-3 flex items-center gap-2">
                 <Upload className="w-5 h-5 text-red-600" />
                 Valid Documents*
               </label>

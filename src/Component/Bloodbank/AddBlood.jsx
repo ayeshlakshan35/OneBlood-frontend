@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import axiosInstance from "../../axiosInstance";
-import { toast } from "react-toastify"; // ✅ Import Toastify
-import "react-toastify/dist/ReactToastify.css";
+import { useToast } from "../Toast/ToastContext";
 
 export default function AddBlood({ onBloodAdded }) {
+  const { showSuccess, showError, showWarning } = useToast();
   const [bloodUnits, setBloodUnits] = useState({
     "A+": "", "A−": "", "B+": "", "B−": "",
     "AB+": "", "AB−": "", "O+": "", "O−": ""
@@ -24,15 +24,15 @@ export default function AddBlood({ onBloodAdded }) {
       }));
 
     if (bloodData.length === 0) {
-      toast.warn("⚠️ Please enter at least one blood unit.");
+      showWarning("Please enter at least one blood unit.");
       return;
     }
 
     try {
       await axiosInstance.post("/bloodroutes/add", { bloodData });
 
-      // ✅ Show Toastify success message
-      toast.success("✅ Blood units updated successfully!");
+      // Show success message
+      showSuccess("Blood units updated successfully!");
 
       // Reset form
       setBloodUnits({
@@ -43,15 +43,13 @@ export default function AddBlood({ onBloodAdded }) {
       if (onBloodAdded) onBloodAdded();
     } catch (err) {
       console.error("❌ Error:", err);
-      toast.error("❌ Failed to submit. Please try again.");
+      showError("Failed to submit. Please try again.");
     }
   };
 
   return (
     <section className="bg-white shadow-lg rounded-2xl p-8 max-w-3xl mx-auto my-8 border border-gray-100">
-      <h2 className="text-3xl font-extrabold text-center mb-8 text-red-600">
-        🩸 Update Blood Stock
-      </h2>
+      
 
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

@@ -37,15 +37,11 @@ export default function Home() {
         {/* Blood Summary Section */}
         <div className="py-16 px-4 lg:px-8">
           <div className="max-w-7xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform hover:scale-[1.02] transition-all duration-300">
-              <div className="bg-gradient-to-r from-red-600 to-red-700 px-8 py-6">
-                <h2 className="text-3xl font-bold text-white mb-2">Blood Donation Statistics</h2>
-                <p className="text-red-100">Real-time data from our blood donation network</p>
-              </div>
+            
               <div className="p-8">
                 <BloodSummary summary={bloodSummary} />
-              </div>
-            </div>
+  
+             </div>
           </div>
         </div>
 

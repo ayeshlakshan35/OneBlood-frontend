@@ -1,77 +1,16 @@
 import React, { useState, useEffect } from "react";
-import axiosInstance from "../../axiosInstance";
+import axiosInstance, { setSessionData, getSessionData } from "../../axiosInstance";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../Toast/ToastContext";
 
-// Creative Toast Notification Component
-const SuccessToast = ({ show, message, onClose }) => {
-  useEffect(() => {
-    if (show) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, 3000); // Auto hide after 3 seconds
 
-      return () => clearTimeout(timer);
-    }
-  }, [show, onClose]);
-
-  if (!show) return null;
-
-  return (
-    <div className="fixed top-6 right-6 z-50 transform transition-all duration-500 ease-out animate-slideIn">
-      <div className="bg-gradient-to-r from-green-400 to-emerald-500 text-white p-4 rounded-xl shadow-2xl border border-green-300 max-w-sm">
-        <div className="flex items-center space-x-3">
-          {/* Success Icon with animation */}
-          <div className="flex-shrink-0">
-            <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center animate-pulse">
-              <svg 
-                className="w-5 h-5 text-white" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M5 13l4 4L19 7" 
-                />
-              </svg>
-            </div>
-          </div>
-          
-          {/* Message */}
-          <div className="flex-1">
-            <p className="font-semibold text-sm">Success!</p>
-            <p className="text-xs text-green-100">{message}</p>
-          </div>
-          
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="flex-shrink-0 text-white hover:text-green-200 transition-colors duration-200"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        
-        {/* Progress bar */}
-        <div className="mt-3 w-full bg-white bg-opacity-20 rounded-full h-1">
-          <div className="bg-white h-1 rounded-full animate-shrink"></div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Enhanced Login Component
 export default function Log({ goto }) {
+  const { showSuccess, showError } = useToast();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [userType, setUserType] = useState("user");
   const [error, setError] = useState("");
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
@@ -84,10 +23,7 @@ export default function Log({ goto }) {
     });
   };
 
-  const showSuccessToast = (message) => {
-    setToastMessage(message);
-    setShowToast(true);
-  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -107,24 +43,49 @@ export default function Log({ goto }) {
 
       const res = await axiosInstance.post(loginUrl, formData);
 
-      // Show creative success toast
-      showSuccessToast(`Welcome back! Redirecting to ${userType === "hospital" ? "hospital" : "donor"} dashboard...`);
+      // Show success toast
+      showSuccess(`Welcome back! Redirecting to ${userType === "hospital" ? "hospital" : "donor"} dashboard...`);
       
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("userType", userType);
-        
-        if (res.data.user) {
-          localStorage.setItem("user", JSON.stringify(res.data.user));
-        }
-        if (res.data.hospital) {
-          localStorage.setItem("hospital", JSON.stringify(res.data.hospital));
-        }
+              if (res.data.token) {
+          // Store data in sessionStorage using tab-specific session management
+          setSessionData("token", res.data.token);
+          setSessionData("userType", userType);
+          
+          if (res.data.user) {
+            setSessionData("user", res.data.user);
+          }
+          if (res.data.hospital) {
+            setSessionData("hospital", res.data.hospital);
+          }
 
-        setTimeout(() => {
-          navigate(userType === "hospital" ? "/BloodB" : "/home");
-        }, 2000); // Slightly longer delay to see the toast
-      }
+          // Debug logging
+          console.log('Login successful - sessionStorage set:', {
+            token: res.data.token,
+            userType: userType,
+            user: res.data.user,
+            hospital: res.data.hospital
+          });
+
+          // Verify sessionStorage was set correctly
+          setTimeout(() => {
+            const storedToken = getSessionData('token');
+            const storedUserType = getSessionData('userType');
+            const storedUser = getSessionData('user');
+            
+            console.log('Verifying sessionStorage after login:', {
+              storedToken,
+              storedUserType,
+              storedUser
+            });
+            
+            if (storedToken && storedUserType) {
+              navigate(userType === "hospital" ? "/BloodB" : "/Home");
+            } else {
+              console.error('sessionStorage verification failed');
+              setError('Login successful but session setup failed. Please try again.');
+            }
+          }, 2000); // Slightly longer delay to see the toast
+        }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Please try again.");
     } finally {
@@ -134,44 +95,6 @@ export default function Log({ goto }) {
 
   return (
     <>
-      {/* Toast Notification */}
-      <SuccessToast 
-        show={showToast} 
-        message={toastMessage}
-        onClose={() => setShowToast(false)}
-      />
-
-      {/* Add custom CSS for animations */}
-      <style jsx>{`
-        @keyframes slideIn {
-          from {
-            transform: translateX(100%) translateY(-20px);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0) translateY(0);
-            opacity: 1;
-          }
-        }
-
-        @keyframes shrink {
-          from {
-            width: 100%;
-          }
-          to {
-            width: 0%;
-          }
-        }
-
-        .animate-slideIn {
-          animation: slideIn 0.5s ease-out;
-        }
-
-        .animate-shrink {
-          animation: shrink 3s linear;
-        }
-      `}</style>
-
       <div className="w-full">
         <p className="text-gray-500 text-center mb-6">
           Use your email and password to sign in

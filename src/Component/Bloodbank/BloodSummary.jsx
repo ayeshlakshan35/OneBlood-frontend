@@ -5,7 +5,7 @@ export default function BloodSummary({ summary }) {
   // Handle case where summary is undefined or null
   if (!summary || typeof summary !== 'object') {
     return (
-      <div className="relative bg-gradient-to-br from-white to-red-50 border border-red-100 rounded-3xl p-12 max-w-6xl mx-auto my-10 shadow-xl overflow-hidden">
+      <div className="relative bg-gradient-to-br from-white to-red-200 border border-red-200 rounded-3xl p-12 max-w-6xl mx-auto my-10 shadow-xl overflow-hidden">
         {/* Animated Background Elements */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-red-100/40 to-transparent rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-red-100/40 to-transparent rounded-full blur-3xl animate-pulse delay-1000"></div>
@@ -17,7 +17,7 @@ export default function BloodSummary({ summary }) {
             </svg>
           </div>
           <h3 className="text-3xl font-bold text-red-700 mb-3">
-            No Data Available
+            No Data Availablity
           </h3>
           <p className="text-red-600 text-lg">Blood donation statistics will appear here</p>
           <div className="mt-6 w-16 h-1 bg-gradient-to-r from-red-400 to-red-600 rounded-full mx-auto"></div>

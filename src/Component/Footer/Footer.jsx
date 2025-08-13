@@ -10,12 +10,9 @@ const Footer = () => {
             {/* Company Info */}
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center mb-3">
-                <img 
-                  src="/src/assets/logo2.png" 
-                  alt="OneBlood Logo" 
-                  className="w-8 h-8 object-contain"
-                />
-                <span className="ml-2 text-lg font-bold">OneBlood</span>
+                  <img src={logo} className="h-10 w-10" alt="logo" />
+                  <span className="text-red-700 font-bold text-lg sm:text-xl">ne</span>
+                  <span className='font-bold text-lg sm:text-xl'>Blood</span>
               </div>
               <p className="text-gray-300 mb-3 max-w-md text-sm">
                 OneBlood is a not-for-profit blood center serving hospitals and patients across the region. 
@@ -56,17 +53,37 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Quick Links */}
-            <div>
-              <h3 className="text-base font-semibold mb-3">Quick Links</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-300 hover:text-red-400 transition-colors duration-200 text-sm">Donate Blood</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-red-400 transition-colors duration-200 text-sm">Find Blood</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-red-400 transition-colors duration-200 text-sm">Blood Types</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-red-400 transition-colors duration-200 text-sm">Camps</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-red-400 transition-colors duration-200 text-sm">Eligibility</a></li>
-              </ul>
-            </div>
+                     {/* Quick Links */}
+          <div>
+            <h3 className="text-base font-semibold mb-3">Quick Links</h3>
+            <ul className="space-y-2">
+              <li>
+                <NavLink to="/DBlood" className="text-gray-300 hover:text-red-400 transition-colors duration-200 text-sm">
+                  Donate Blood
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/FBlood" className="text-gray-300 hover:text-red-400 transition-colors duration-200 text-sm">
+                  Find Blood
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/FBlood" className="text-gray-300 hover:text-red-400 transition-colors duration-200 text-sm">
+                  Blood Types
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/Camp" className="text-gray-300 hover:text-red-400 transition-colors duration-200 text-sm">
+                  Camps
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/DBlood" className="text-gray-300 hover:text-red-400 transition-colors duration-200 text-sm">
+                  Eligibility
+                </NavLink>
+              </li>
+            </ul>
+          </div>
 
             {/* Contact & Support */}
             <div>
